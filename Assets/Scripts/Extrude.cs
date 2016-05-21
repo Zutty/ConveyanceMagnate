@@ -66,7 +66,7 @@ public class Extrude : MonoBehaviour {
 			int offset = i * shapeVertices;
 			for (int j = 0; j < shapeVertices; j++) {
 				int id = offset + j;
-				vertices [id] = splinePoints [i].LocalToWorld(shape.vertices [j]);
+				vertices [id] = transform.InverseTransformPoint(splinePoints [i].LocalToWorld(shape.vertices [j]));
 				normals [id] = splinePoints [i].LocalToWorldDirection(shape.normals [j]);
 				uv [id] = new Vector2 (shape.u [j], i / (float)splineLen);
 			}
@@ -90,6 +90,7 @@ public class Extrude : MonoBehaviour {
 		}
 
 		mesh.Clear();
+		//mesh.
 		mesh.vertices = vertices;
 		mesh.triangles = triangles;
 		mesh.normals = normals;
