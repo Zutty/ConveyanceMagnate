@@ -17,10 +17,10 @@ public class Extrude : MonoBehaviour {
 	public Transform c;
 	public Transform d;
 
-	private CubicBezierSpline spline;
+	private CatmullRomSpline spline;
 	private Mesh mesh;
 
-	private CubicBezierSpline.Point[] splinePoints;
+	private CatmullRomSpline.Point[] splinePoints;
 	private int[] triangles;
 	private Vector3[] vertices;
 	private Vector3[] normals;
@@ -28,7 +28,7 @@ public class Extrude : MonoBehaviour {
 
 	void Start() {
 		mesh = GetComponent<MeshFilter>().sharedMesh = new Mesh ();
-		spline = new CubicBezierSpline (a.position, b.position, c.position, d.position);
+		//spline = new CubicBezierSpline (a.position, b.position, c.position, d.position);
 		Resize(16);
 	}
 
@@ -37,7 +37,7 @@ public class Extrude : MonoBehaviour {
 	}
 
 	void Resize(int splineLen) {
-		splinePoints = new CubicBezierSpline.Point[splineLen];
+		splinePoints = new CatmullRomSpline.Point[splineLen];
 
 		Debug.Log(splinePoints);
 
@@ -53,10 +53,10 @@ public class Extrude : MonoBehaviour {
 	}
 
 	void Recalculate() {
-		spline.a = a.position;
-		spline.b = b.position;
-		spline.c = c.position;
-		spline.d = d.position;
+		spline.p0 = a.position;
+		spline.p1 = b.position;
+		spline.p2 = c.position;
+		spline.p3 = d.position;
 		spline.Sample(splinePoints);
 
 		int splineLen = splinePoints.Length;

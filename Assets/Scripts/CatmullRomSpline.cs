@@ -194,41 +194,54 @@ public struct CatmullRomSpline {
 
 	}
 
-	void smain() {
-		//CubicPoly px, py;
-		//InitCentripetalCR(p0, p1, p2, p3, px, py);
-		//for (int i = 0; i <= 10; ++i)
-		//	cout << px.eval(0.1f*i) << " " << py.eval(0.1f*i) << endl;
-	}
+	public Vector3 p0;
+	public Vector3 p1;
+	public Vector3 p2;
+	public Vector3 p3;
 
-	public void GetPoint(float t) {
-		float oneMinusT = 1f - t;
-		float oneMinusT2 = oneMinusT * oneMinusT;
-		float t2 = t * t;
-		/*
-		Vector3 position = a * (oneMinusT2 * oneMinusT)
-			+ b * (3f * oneMinusT2 * t)
-			+ c * (3f * oneMinusT * t2)
-			+ d * (t2 * t);
+	public Point GetPoint(float t) {
+		float dt0 = Mathf.Pow(VecDistSquared(p0, p1), 0.25f);
+		float dt1 = Mathf.Pow(VecDistSquared(p1, p2), 0.25f);
+		float dt2 = Mathf.Pow(VecDistSquared(p2, p3), 0.25f);
 
-		Vector3 tangent = a * (-oneMinusT2)
-			+ b * (3f * oneMinusT2 - 2f * oneMinusT)
-			+ c * (-3f * t2 + 2f * t)
-			+ d * (t2);
+		// safety check for repeated points
+		if (dt1 < 1e-4f)    dt1 = 1.0f;
+		if (dt0 < 1e-4f)    dt0 = dt1;
+		if (dt2 < 1e-4f)    dt2 = dt1;
+
+		Vector3 m1 = (p1 - p0) / dt0 - (p2 - p0) / (dt0 + dt1) + (p2 - p1) / dt1;
+		Vector3 m2 = (p2 - p1) / dt1 - (p3 - p1) / (dt1 + dt2) + (p3 - p2) / dt2;
+
+		m1 *= dt1;
+		m2 *= dt1;
+
+		Vector3 c0 = p1;
+		Vector3 c1 = m1;
+		Vector3 c2 = -3*p1 + 3*p2 - 2*m1 - m2;
+		Vector3 c3 = 2*p1 - 2*p2 + m1 + m2;
+
+		float t2 = t*t;
+		float t3 = t2 * t;
+		Vector3 position = c0 + c1*t + c2*t2 + c3*t3;
+
+		Vector3 d0 = m1;
+		Vector3 d1 = -6*p1 + 6*p2 - 4*m1 - 2*m2;
+		Vector3 d2 = 6*p1 - 6*p2 + 3*m1 + 3*m2;
+
+		Vector3 tangent = d0 + d1 * t + d2 * t2;
 
 		Vector3 binormal = Vector3.Cross(Vector3.up, tangent).normalized;
 		Vector3 normal = Vector3.Cross(tangent, binormal);
 		Quaternion orientation = Quaternion.LookRotation(tangent, normal);
-		*/
 
-		//return new Point (position, orientation);
+		return new Point (position, orientation);
 	}
 
 	public void Sample(Point[] points) {
 		float len = points.Length - 1;
 		for (int n = 0; n <= len; n++) {
 			float t = (float)n / len;
-			//points [n] = GetPoint(t);
+			points [n] = GetPoint(t);
 		}
 	}
 }
