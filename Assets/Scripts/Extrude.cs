@@ -92,10 +92,6 @@ public class Extrude : MonoBehaviour {
 
 	void OnDrawGizmos() {
 		Gizmos.color = Color.white;
-		Gizmos.DrawWireSphere(a.position, 0.3f);
-		Gizmos.DrawWireSphere(b.position, 0.3f);
-		Gizmos.DrawWireSphere(c.position, 0.3f);
-		Gizmos.DrawWireSphere(d.position, 0.3f);
 
 		spline.p0 = a.position;
 		spline.p1 = b.position;
@@ -109,7 +105,6 @@ public class Extrude : MonoBehaviour {
 				continue;
 			}
 
-			Gizmos.color = Color.white;
 			Gizmos.DrawLine(p.position, q);
 
 			q = p.position;

@@ -5,10 +5,10 @@ public class Handle : MonoBehaviour {
 
 	public LayerMask layerMask;
 
-	private Renderer _renderer;
+	private Projector _projector;
 
 	void Start () {
-		_renderer = GetComponent<Renderer> ();
+		_projector = GetComponent<Projector> ();
 	}
 	
 	void Update () {
@@ -16,11 +16,11 @@ public class Handle : MonoBehaviour {
 	}
 
 	void OnMouseOver() {
-		_renderer.material.SetColor("_TintColor", Color.blue);
+		//_renderer.material.SetColor("_TintColor", Color.blue);
 	}
 
 	void OnMouseExit() {
-		_renderer.material.SetColor("_TintColor", Color.white);
+		//_renderer.material.SetColor("_TintColor", Color.white);
 	}
 
 	void OnMouseDrag() {
