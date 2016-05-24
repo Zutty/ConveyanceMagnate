@@ -12,6 +12,7 @@ public class Extrude : MonoBehaviour {
 	}
 
 	public Shape shape;
+	public float elevation = 0.05f;
 	public Transform a;
 	public Transform b;
 	public Transform c;
@@ -54,6 +55,11 @@ public class Extrude : MonoBehaviour {
 		spline.p1 = b.position;
 		spline.p2 = c.position;
 		spline.p3 = d.position;
+
+		spline.p0.y += elevation;
+		spline.p1.y += elevation;
+		spline.p2.y += elevation;
+		spline.p3.y += elevation;
 
 		int shapeVertices = shape.vertices.Length;
 
