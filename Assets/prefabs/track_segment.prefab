@@ -1,17 +1,18 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &170498
+--- !u!1 &164216
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 448362}
-  - 135: {fileID: 13536106}
-  - 114: {fileID: 11460276}
+  - 4: {fileID: 419464}
+  - 135: {fileID: 13520510}
+  - 114: {fileID: 11485724}
+  - 119: {fileID: 11985432}
   m_Layer: 5
-  m_Name: handle
+  m_Name: track_segment_1_handle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35,22 +36,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!1 &196660
-GameObject:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 446488}
-  - 119: {fileID: 11963000}
-  m_Layer: 5
-  m_Name: prj
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
 --- !u!4 &419318
 Transform:
   m_ObjectHideFlags: 1
@@ -58,35 +43,22 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 183478}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.5325775, y: 0.49, z: 20.991669}
+  m_LocalPosition: {x: 0.18, y: 0, z: -7.27}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 448362}
+  - {fileID: 419464}
   m_Father: {fileID: 0}
   m_RootOrder: 0
---- !u!4 &446488
+--- !u!4 &419464
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 196660}
+  m_GameObject: {fileID: 164216}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071067}
-  m_LocalPosition: {x: 0, y: 3.65, z: -0}
+  m_LocalPosition: {x: -0, y: 0, z: -16.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 448362}
-  m_RootOrder: 0
---- !u!4 &448362
-Transform:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 170498}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.157422, y: -0.49, z: -27.12167}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 446488}
   m_Father: {fileID: 419318}
   m_RootOrder: 0
 --- !u!23 &2382204
@@ -192,16 +164,17 @@ MonoBehaviour:
     - 0.84375
     - 1
     lines: 000000000100000001000000020000000200000003000000030000000400000004000000050000000500000006000000060000000700000007000000080000000800000009000000090000000a0000000a0000000b0000000b0000000c0000000c0000000d0000000d0000000e0000000e0000000f0000000f000000100000001000000011000000
+  elevation: 0.05
   a: {fileID: 0}
   b: {fileID: 0}
-  c: {fileID: 0}
+  c: {fileID: 419464}
   d: {fileID: 0}
---- !u!114 &11460276
+--- !u!114 &11485724
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 170498}
+  m_GameObject: {fileID: 164216}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cdbc5571b72914bfbad5187d23f44059, type: 3}
@@ -210,30 +183,30 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 4294967263
---- !u!119 &11963000
+--- !u!119 &11985432
 Projector:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 196660}
+  m_GameObject: {fileID: 164216}
   m_Enabled: 1
   serializedVersion: 2
-  m_NearClipPlane: 0.1
-  m_FarClipPlane: 100
+  m_NearClipPlane: -1
+  m_FarClipPlane: 1
   m_FieldOfView: 60
   m_AspectRatio: 1
-  m_Orthographic: 0
-  m_OrthographicSize: 10
+  m_Orthographic: 1
+  m_OrthographicSize: 2
   m_Material: {fileID: 2100000, guid: 11aa05a0c290274419acb7fa79e620f6, type: 2}
   m_IgnoreLayers:
     serializedVersion: 2
     m_Bits: 0
---- !u!135 &13536106
+--- !u!135 &13520510
 SphereCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 170498}
+  m_GameObject: {fileID: 164216}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
