@@ -34,7 +34,15 @@ public class Extrude : MonoBehaviour {
 	}
 
 	void Update() {
-		Recalculate();
+		Reposition ();
+
+		int len = Mathf.CeilToInt(spline.ArcLength (1f) / 2f);
+
+		if (len != splineLen) {
+			Resize (len);
+		} else {
+			Recalculate ();
+		}
 	}
 
 	void Resize(int splineLen) {
@@ -50,7 +58,7 @@ public class Extrude : MonoBehaviour {
 		Recalculate();
 	}
 
-	void Recalculate() {
+	void Reposition() {
 		spline.p0 = a.position;
 		spline.p1 = b.position;
 		spline.p2 = c.position;
@@ -60,7 +68,9 @@ public class Extrude : MonoBehaviour {
 		spline.p1.y += elevation;
 		spline.p2.y += elevation;
 		spline.p3.y += elevation;
+	}
 
+	void Recalculate() {
 		int shapeVertices = shape.vertices.Length;
 
 		int idx = 0;
@@ -68,7 +78,7 @@ public class Extrude : MonoBehaviour {
 			for(int j = 0; j < shapeVertices; j++, idx++) {
 				vertices[idx] = transform.InverseTransformPoint(p.LocalToWorld(shape.vertices[j]));
 				normals[idx] = p.LocalToWorldDirection(shape.normals[j]);
-				uv[idx] = new Vector2(shape.u[j], p.index / (float)splineLen);
+				uv[idx] = new Vector2(shape.u[j], p.len / 2f);
 			}
 		}
 

@@ -7,6 +7,7 @@ public struct CatmullRomSpline {
 		public Vector3 position;
 		public Quaternion orientation;
 		public int index;
+		public float len;
 
 		public Vector3 LocalToWorld(Vector3 point) {
 			return position + orientation * point;
@@ -165,6 +166,7 @@ public struct CatmullRomSpline {
 			float s = (float)(n / (len - 1f)) * l;
 			Point p = GetPoint(GetCurveParameter(s));
 			p.index = n;
+			p.len = s;
 			yield return p;
 		}
 	}
