@@ -138,6 +138,11 @@ public struct CatmullRomSpline {
 
 		Vector3 binormal = Vector3.Cross(Vector3.up, tangent).normalized;
 		Vector3 normal = Vector3.Cross(tangent, binormal);
+
+		if(tangent.magnitude <= 1 || tangent == Vector3.zero || normal.magnitude <= 1 || normal == Vector3.zero) {
+			Debug.Log ("bad thing");
+		}
+
 		Quaternion orientation = Quaternion.LookRotation(tangent, normal);
 
 		Point p = new Point();
@@ -161,7 +166,7 @@ public struct CatmullRomSpline {
 	}
 
 	public IEnumerable<Point> Sample(int len) {
-		float l = ArcLength(1);
+		float l = ArcLength(1f);
 		for(int n = 0; n < len; n++) {
 			float s = (float)(n / (len - 1f)) * l;
 			Point p = GetPoint(GetCurveParameter(s));

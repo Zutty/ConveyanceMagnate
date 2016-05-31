@@ -30,6 +30,7 @@ public class Extrude : MonoBehaviour {
 	void Start() {
 		mesh = GetComponent<MeshFilter>().sharedMesh = new Mesh();
 		//spline = new CubicBezierSpline (a.position, b.position, c.position, d.position);
+		spline = new CatmullRomSpline();
 		Resize(16);
 	}
 
