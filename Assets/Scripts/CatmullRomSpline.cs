@@ -165,15 +165,27 @@ public struct CatmullRomSpline {
 		return t ; 
 	}
 
-	public IEnumerable<Point> Sample(int len) {
-		float l = ArcLength(1f);
-		for(int n = 0; n < len; n++) {
-			float s = (float)(n / (len - 1f)) * l;
-			Point p = GetPoint(GetCurveParameter(s));
-			p.index = n;
-			p.len = s;
-			yield return p;
+	public IEnumerable<Point> Sample(int points) {
+		float arcLen = ArcLength(1f);
+
+		Point p = GetPoint(0f);
+		p.index = 0;
+		p.len = 0f;
+		yield return p;
+
+		for(int n = 1; n < points - 1; n++) {
+			float s = (n / (points - 1f)) * arcLen;
+
+			Point q = GetPoint(GetCurveParameter(s));
+			q.index = n;
+			q.len = s;
+			yield return q;
 		}
+
+		p = GetPoint(1f);
+		p.index = points;
+		p.len = arcLen;
+		yield return p;
 	}
 
 
