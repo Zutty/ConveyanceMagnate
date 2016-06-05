@@ -41,6 +41,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdbc5571b72914bfbad5187d23f44059, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mode: 0
+  selectMaterial: {fileID: 2100000, guid: 39104a456443cf54da8eb32c2987c84d, type: 2}
   layerMask:
     serializedVersion: 2
     m_Bits: 4294967263
