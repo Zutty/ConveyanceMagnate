@@ -25,7 +25,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 180416}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071067}
-  m_LocalPosition: {x: -0, y: 0, z: -6.13}
+  m_LocalPosition: {x: 37.76767, y: 0, z: -82.71417}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -45,7 +45,7 @@ MonoBehaviour:
   selectMaterial: {fileID: 2100000, guid: 39104a456443cf54da8eb32c2987c84d, type: 2}
   layerMask:
     serializedVersion: 2
-    m_Bits: 4294967263
+    m_Bits: 256
 --- !u!119 &11926588
 Projector:
   m_ObjectHideFlags: 1
