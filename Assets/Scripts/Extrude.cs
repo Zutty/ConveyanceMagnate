@@ -12,6 +12,7 @@ public class Extrude : MonoBehaviour {
 	}
 
 	public Shape shape;
+	public GameObject colliderSegmentPrefab;
 	public float elevation = 0.05f;
 	public Transform a;
 	public Transform b;
@@ -27,17 +28,23 @@ public class Extrude : MonoBehaviour {
 	private Vector3[] normals;
 	private Vector2[] uv;
 
+	private List<BoxCollider> _colliderSegments = new List<BoxCollider>();
+
 	void Start() {
 		mesh = GetComponent<MeshFilter>().sharedMesh = new Mesh();
 		//spline = new CubicBezierSpline (a.position, b.position, c.position, d.position);
 		spline = new CatmullRomSpline();
-		Resize(16);
+		Debug.Log("Starting");
+
+		Reposition ();
+		int len = Mathf.CeilToInt(spline.ArcLength(1f) / 2f);
+		Resize(len);
 	}
 
 	void Update() {
 		Reposition ();
 
-		int len = Mathf.CeilToInt(spline.ArcLength (1f) / 2f);
+		int len = Mathf.CeilToInt(spline.ArcLength(1f) / 2f);
 
 		if (len != splineLen) {
 			Resize (len);
@@ -48,6 +55,7 @@ public class Extrude : MonoBehaviour {
 
 	void Resize(int splineLen) {
 		this.splineLen = splineLen;
+
 		int vertexCount = shape.vertices.Length * splineLen;
 		int indexCount = shape.lines.Length * (splineLen - 1) * 3;
 
@@ -55,6 +63,23 @@ public class Extrude : MonoBehaviour {
 		vertices = new Vector3[ vertexCount ];
 		normals = new Vector3[ vertexCount ];
 		uv = new Vector2[ vertexCount ];
+
+		int diff = splineLen - 1 - _colliderSegments.Count;
+		if(_colliderSegments.Count < splineLen - 1) {
+			for(int i = 0; i < diff; i++) {
+				GameObject colliderSegment = (GameObject)Instantiate(colliderSegmentPrefab);
+				colliderSegment.transform.parent = transform;
+				_colliderSegments.Add(colliderSegment.GetComponent<BoxCollider>());
+			}
+		} else if(_colliderSegments.Count > splineLen - 1) {
+			for(int i = splineLen - 1; i < _colliderSegments.Count; i++) {
+				Destroy(_colliderSegments[i].gameObject);
+			}
+			_colliderSegments.RemoveRange(splineLen - 1, _colliderSegments.Count - splineLen + 1);
+		}
+		if(splineLen - 1 != _colliderSegments.Count) {
+			Debug.Log("splineLen - 1 = "+(splineLen - 1)+", _colliderSegments.Count = "+_colliderSegments.Count);
+		}
 
 		Recalculate();
 	}
@@ -74,13 +99,23 @@ public class Extrude : MonoBehaviour {
 	void Recalculate() {
 		int shapeVertices = shape.vertices.Length;
 
-		int idx = 0;
+		int idx = 0, ci = -1;
+		Vector3 prev = Vector3.zero;
 		foreach(CatmullRomSpline.Point p in spline.Sample(splineLen)) {
 			for(int j = 0; j < shapeVertices; j++, idx++) {
 				vertices[idx] = transform.InverseTransformPoint(p.LocalToWorld(shape.vertices[j]));
 				normals[idx] = p.LocalToWorldDirection(shape.normals[j]);
 				uv[idx] = new Vector2(shape.u[j], p.len / 2f);
 			}
+
+			if(ci >= 0) {
+				//Debug.Log(" _colliderSegments["+ci+"] -> "+ p.position + " & " + prev);
+				_colliderSegments[ci].transform.position = (p.position + prev) / 2;
+				_colliderSegments[ci].transform.rotation = Quaternion.LookRotation(p.position - prev);
+				_colliderSegments[ci].size = new Vector3(2, 1, Vector3.Distance(p.position, prev));
+			}
+			ci++;
+			prev = p.position;
 		}
 
 		int ti = 0;
