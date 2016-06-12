@@ -44,15 +44,8 @@ public class EditableSpline : MonoBehaviour {
 		}
 	}
 
-	public void Update() {
-		if(Input.GetMouseButton(2)) {
-			//GetComponentInParent<EditableSpline>().AddSection();
-			AddSection(3);
-		}
-	}
-
 	public void AddSection(int offset) {
-		if(offset < 1 || offset >= points.Count - 2) {
+		if(offset < 1 || offset > points.Count - 2) {
 			throw new UnityException();
 		}
 
