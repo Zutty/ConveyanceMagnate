@@ -181,6 +181,86 @@ public struct CatmullRomSpline {
 		return t;
 	}
 
+	public void DoIntersection(Vector3 c, float r, float t, out float f, out float fPrime) {
+		float dt0 = Mathf.Sqrt(Vector3.Distance(p0, p1));
+		float dt1 = Mathf.Sqrt(Vector3.Distance(p1, p2));
+		float dt2 = Mathf.Sqrt(Vector3.Distance(p2, p3));
+
+		// safety check for repeated points
+		if(dt1 < Mathf.Epsilon) {
+			dt1 = 1.0f;
+		}
+		if(dt0 < Mathf.Epsilon) {
+			dt0 = dt1;
+		}
+		if(dt2 < Mathf.Epsilon) {
+			dt2 = dt1;
+		}
+
+		Vector3 m1 = (p1 - p0) / dt0 - (p2 - p0) / (dt0 + dt1) + (p2 - p1) / dt1;
+		Vector3 m2 = (p2 - p1) / dt1 - (p3 - p1) / (dt1 + dt2) + (p3 - p2) / dt2;
+
+		m1 *= dt1;
+		m2 *= dt1;
+
+		Vector3 c0 = p1;
+		Vector3 c1 = m1;
+		Vector3 c2 = -3 * p1 + 3 * p2 - 2 * m1 - m2;
+		Vector3 c3 = 2 * p1 - 2 * p2 + m1 + m2;
+
+		float t2 = t * t;
+		float t3 = t2 * t;
+		Vector3 position = c0 + c1 * t + c2 * t2 + c3 * t3;
+
+		Vector3 d0 = m1;
+		Vector3 d1 = -6 * p1 + 6 * p2 - 4 * m1 - 2 * m2;
+		Vector3 d2 = 6 * p1 - 6 * p2 + 3 * m1 + 3 * m2;
+
+		Vector3 tangent = d0 + d1 * t + d2 * t2;
+
+		// f = (position.x - c.x)^2 + (position.y - c.y)^2 + (position.z - c.z)^2 - r^2
+		f = (position - c).sqrMagnitude - Mathf.Pow(r, 2f);
+
+		// f' = 2*(position.x - c.x)*tangent.x + 2*(position.y - c.y)*tangent.y + 2*(position.z - c.z)*tangent.z
+		fPrime = 2f * (((position.x - c.x) * tangent.x) + ((position.y - c.y) * tangent.y) + ((position.z - c.z) * tangent.z));
+	}
+
+	public float CircleIntersectionGuess(float s, float r) {
+		return (s - r) / ArcLength(1f);
+	}
+
+	public float CircleIntersection(Vector3 c, float r, float initial) {
+		float t = initial;
+		float lower = 0f, upper = 1f;
+		float MAX_ITERATIONS = 10;
+
+		for(int i = 0; i < MAX_ITERATIONS; i++) {
+			float f, df;
+			DoIntersection(c, r, t, out f, out df);
+
+			if(Mathf.Abs(f) < 0.001f) {
+				return t;
+			}
+
+			float tCandidate = t - (f / df);
+
+			if(tCandidate < 0f || tCandidate > 1f) {
+				return 0;
+			}
+
+			if(f > 0) {
+				upper = t;
+				t = (tCandidate <= lower) ? (upper + lower) / 2f : tCandidate;
+			} else {
+				lower = t;
+				t = (tCandidate >= upper) ? (upper + lower) / 2f : tCandidate;
+			}
+		}
+
+		Debug.LogWarning("Root was not found after " + MAX_ITERATIONS + " iterations");
+		return t;
+	}
+
 	public IEnumerable<Point> Sample(int points) {
 		float arcLen = ArcLength(1f);
 

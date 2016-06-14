@@ -36,6 +36,38 @@ public class EditableSpline : MonoBehaviour {
 		transform.rotation = p.orientation;
 	}
 
+	public void UpdateTransformTrailing(float distance, float trail, Transform transform) {
+		CatmullRomSpline spline = new CatmullRomSpline ();
+		float s = distance;
+		float len = 0;
+
+		for(int offset = 0; offset < points.Count - 3; offset++) {
+			s -= len;
+
+			spline.p0 = points [offset].position;
+			spline.p1 = points [offset + 1].position;
+			spline.p2 = points [offset + 2].position;
+			spline.p3 = points [offset + 3].position;
+
+			len = spline.ArcLength(1f);
+
+			if(s < len) {
+				break;
+			}
+		}
+
+		if(s > len) {
+			return;
+		}
+
+		CatmullRomSpline.Point p = spline.GetPoint (spline.GetCurveParameter (s));
+
+		CatmullRomSpline.Point trailing = spline.GetPoint (spline.CircleIntersection(p.position, trail, spline.CircleIntersectionGuess(s, trail)));
+
+		transform.position = trailing.position;
+		transform.rotation = trailing.orientation;
+	}
+
 	public void OnDrawGizmos() {
 		Gizmos.color = Color.white;
 
