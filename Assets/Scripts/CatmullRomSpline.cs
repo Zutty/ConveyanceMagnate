@@ -152,17 +152,33 @@ public struct CatmullRomSpline {
 	}
 
 	public float GetCurveParameter(float s) {
-		float t = 0;
-		int n = 10;
-		float h = s/n;
-		for (int i = 1; i <= n; i++) {
-			float k1 = h/Speed(t);
-			float k2 = h/Speed(t + k1/2);
-			float k3 = h/Speed(t + k2/2);
-			float k4 = h/Speed(t + k3);
-			t += (k1 + 2 * (k2 + k3) + k4)/6;
+		float arcLen = ArcLength(1f);
+		float t = s / arcLen; // Initial guess
+
+		float lower = 0f, upper = 1f;
+		float MAX_ITERATIONS = 10;
+
+		for(int i = 0; i < MAX_ITERATIONS; i++) {
+			float f = ArcLength(t) - s;
+			if(Mathf.Abs(f) < 0.001f) {
+				return t;
+			}
+
+			float df = Speed(t);
+
+			float tCandidate = t - (f / df);
+
+			if(f > 0) {
+				upper = t;
+				t = (tCandidate <= lower) ? (upper + lower) / 2f : tCandidate;
+			} else {
+				lower = t;
+				t = (tCandidate >= upper) ? (upper + lower) / 2f : tCandidate;
+			}
 		}
-		return t ; 
+
+		Debug.LogWarning("Root was not found after " + MAX_ITERATIONS + " iterations");
+		return t;
 	}
 
 	public IEnumerable<Point> Sample(int points) {
