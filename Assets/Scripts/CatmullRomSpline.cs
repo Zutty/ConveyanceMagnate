@@ -173,13 +173,7 @@ public struct CatmullRomSpline {
 				return 0;
 			}
 
-			if(f > 0) {
-				upper = t;
-				t = (tCandidate <= lower) ? (upper + lower) / 2f : tCandidate;
-			} else {
-				lower = t;
-				t = (tCandidate >= upper) ? (upper + lower) / 2f : tCandidate;
-			}
+			t = tCandidate;
 		}
 
 		Debug.LogWarning("Root was not found after " + MAX_ITERATIONS + " iterations");
