@@ -1,25 +1,47 @@
 ﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
-public class EditableSpline : MonoBehaviour {
+public class EditableSpline : MonoBehaviour, IEnumerable<CatmullRomSpline> {
 
 	public List<Transform> points;
 	public GameObject sectionPrefab;
 
+	public CatmullRomSpline this[int offset] {
+		get { 
+			CatmullRomSpline spline = new CatmullRomSpline();
+			spline.p0 = points[offset].position;
+			spline.p1 = points[offset + 1].position;
+			spline.p2 = points[offset + 2].position;
+			spline.p3 = points[offset + 3].position;
+			spline.CalculateBasis();
+			return spline;
+		}
+	}
+
+	public int Length {
+		get { return points.Count - 3; }
+	}
+
+	public IEnumerator<CatmullRomSpline> GetEnumerator() {
+		for(int offset = 0; offset < this.Length; offset++) {
+			yield return this[offset];
+		}
+	}
+
+	IEnumerator IEnumerable.GetEnumerator() {
+		return GetEnumerator();
+	}
+
 	public void UpdateTransform(float distance, Transform transform) {
-		CatmullRomSpline spline = new CatmullRomSpline ();
 		float s = distance;
 		float len = 0;
+		int offset;
 
-		for(int offset = 0; offset < points.Count - 3; offset++) {
+		for(offset = 0; offset < Length; offset++) {
 			s -= len;
 
-			spline.p0 = points [offset].position;
-			spline.p1 = points [offset + 1].position;
-			spline.p2 = points [offset + 2].position;
-			spline.p3 = points [offset + 3].position;
-
-			len = spline.ArcLength(1f);
+			len = this[offset].ArcLength(1f);
 
 			if(s < len) {
 				break;
@@ -30,26 +52,22 @@ public class EditableSpline : MonoBehaviour {
 			return;
 		}
 
-		CatmullRomSpline.Point p = spline.GetPoint (spline.GetCurveParameter (s));
+		CatmullRomSpline spline = this[offset];
+		CatmullRomSpline.Point p = spline.GetPoint(spline.GetCurveParameter(s));
 
 		transform.position = p.position;
 		transform.rotation = p.orientation;
 	}
 
 	public void UpdateTransformTrailing(float distance, float trail, Transform transform) {
-		CatmullRomSpline spline = new CatmullRomSpline ();
 		float s = distance;
 		float len = 0;
+		int offset;
 
-		for(int offset = 0; offset < points.Count - 3; offset++) {
+		for(offset = 0; offset < Length; offset++) {
 			s -= len;
 
-			spline.p0 = points [offset].position;
-			spline.p1 = points [offset + 1].position;
-			spline.p2 = points [offset + 2].position;
-			spline.p3 = points [offset + 3].position;
-
-			len = spline.ArcLength(1f);
+			len = this[offset].ArcLength(1f);
 
 			if(s < len) {
 				break;
@@ -60,9 +78,11 @@ public class EditableSpline : MonoBehaviour {
 			return;
 		}
 
-		CatmullRomSpline.Point p = spline.GetPoint (spline.GetCurveParameter (s));
+		CatmullRomSpline spline = this[offset];
 
-		CatmullRomSpline.Point trailing = spline.GetPoint (spline.CircleIntersection(p.position, trail, spline.CircleIntersectionGuess(s, trail)));
+		CatmullRomSpline.Point p = spline.GetPoint(spline.GetCurveParameter(s));
+
+		CatmullRomSpline.Point trailing = spline.GetPoint(spline.CircleIntersection(p.position, trail, spline.CircleIntersectionGuess(s, trail)));
 
 		transform.position = trailing.position;
 		transform.rotation = trailing.orientation;
