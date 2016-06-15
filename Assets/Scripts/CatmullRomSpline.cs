@@ -139,41 +139,30 @@ public struct CatmullRomSpline {
 		return t;
 	}
 
-	public void DoIntersection(Vector3 c, float r, float t, out float f, out float fPrime) {
-		Vector3 position = Position(t);
-		Vector3 tangent = Tangent(t);
-
-		// f = (position.x - c.x)^2 + (position.y - c.y)^2 + (position.z - c.z)^2 - r^2
-		f = (position - c).sqrMagnitude - (r * r);
-
-		// f' = 2*(position.x - c.x)*tangent.x + 2*(position.y - c.y)*tangent.y + 2*(position.z - c.z)*tangent.z
-		fPrime = 2f * (((position.x - c.x) * tangent.x) + ((position.y - c.y) * tangent.y) + ((position.z - c.z) * tangent.z));
-	}
-
 	public float CircleIntersectionGuess(float s, float r) {
 		return (s - r) / ArcLength(1f);
 	}
 
 	public float CircleIntersection(Vector3 c, float r, float initial) {
 		float t = initial;
-		float lower = 0f, upper = 1f;
 		float MAX_ITERATIONS = 10;
 
 		for(int i = 0; i < MAX_ITERATIONS; i++) {
-			float f, df;
-			DoIntersection(c, r, t, out f, out df);
+			Vector3 position = Position(t);
+			float f = (position - c).sqrMagnitude - (r * r);
 
 			if(Mathf.Abs(f) < 0.001f) {
 				return t;
 			}
 
-			float tCandidate = t - (f / df);
+			Vector3 tangent = Tangent(t);
+			float df = 2f * (((position.x - c.x) * tangent.x) + ((position.y - c.y) * tangent.y) + ((position.z - c.z) * tangent.z));
 
-			if(tCandidate < 0f || tCandidate > 1f) {
+			t -= f / df;
+
+			if(t < 0f || t > 1f) {
 				return 0;
 			}
-
-			t = tCandidate;
 		}
 
 		Debug.LogWarning("Root was not found after " + MAX_ITERATIONS + " iterations");
