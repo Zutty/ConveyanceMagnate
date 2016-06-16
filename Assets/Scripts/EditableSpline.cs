@@ -53,10 +53,10 @@ public class EditableSpline : MonoBehaviour, IEnumerable<CatmullRomSpline> {
 		}
 
 		CatmullRomSpline spline = this[offset];
-		CatmullRomSpline.Point p = spline.GetPoint(spline.GetCurveParameter(s));
 
-		transform.position = p.position;
-		transform.rotation = p.orientation;
+		float t = spline.GetCurveParameter(s);
+		transform.position = spline.GetPosition(t);
+		transform.rotation = spline.GetRotation(t, Vector3.up);
 	}
 
 	public void UpdateTransformTrailing(float distance, float trail, Transform transform) {
@@ -80,12 +80,10 @@ public class EditableSpline : MonoBehaviour, IEnumerable<CatmullRomSpline> {
 
 		CatmullRomSpline spline = this[offset];
 
-		CatmullRomSpline.Point p = spline.GetPoint(spline.GetCurveParameter(s));
+		float t = spline.CircleIntersection(spline.GetPosition(spline.GetCurveParameter(s)), trail, spline.CircleIntersectionGuess(s, trail));
 
-		CatmullRomSpline.Point trailing = spline.GetPoint(spline.CircleIntersection(p.position, trail, spline.CircleIntersectionGuess(s, trail)));
-
-		transform.position = trailing.position;
-		transform.rotation = trailing.orientation;
+		transform.position = spline.GetPosition(t);
+		transform.rotation = spline.GetRotation(t, Vector3.up);
 	}
 
 	public void OnDrawGizmos() {

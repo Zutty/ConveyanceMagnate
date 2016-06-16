@@ -65,11 +65,11 @@ public struct CatmullRomSpline {
 		derivative.c = m1;
 	}
 
-	public Vector3 Position(float t) {
+	public Vector3 GetPosition(float t) {
 		return basis.Solve(t);
 	}
 
-	public Vector3 Tangent(float t) {
+	public Vector3 GetTangent(float t) {
 		return derivative.Solve(t);
 	}
 
@@ -80,7 +80,7 @@ public struct CatmullRomSpline {
 		for(int i = 1; i <= 10; i++) {
 			float t = (i / 10f) * tmax;
 
-			Vector3 tangent = Tangent(t);
+			Vector3 tangent = GetTangent(t);
 
 			sum += (t - (((i - 1) / 10f) * tmax)) * (prev + tangent.magnitude);
 
@@ -90,9 +90,21 @@ public struct CatmullRomSpline {
 		return  sum / 2f;
 	}
 
-	public Point GetPoint(float t) {
-		Vector3 position = Position(t);
-		Vector3 tangent = Tangent(t);
+	public Quaternion GetRotation(float t, Vector3 up) {
+		Vector3 tangent = GetTangent(t);
+		Vector3 binormal = Vector3.Cross(up, tangent).normalized;
+		Vector3 normal = Vector3.Cross(tangent, binormal);
+
+		if(tangent.magnitude <= 0.001f || tangent == Vector3.zero || normal.magnitude <= 0.001f || normal == Vector3.zero) {
+			Debug.Log ("bad thing - tangent.magnitude = " + tangent.magnitude + ", normal.magnitude = " + normal.magnitude);
+		}
+
+		return Quaternion.LookRotation(tangent, normal);
+	}
+
+	public Point GetPoint(float t, int index, float len) {
+		Vector3 position = GetPosition(t);
+		Vector3 tangent = GetTangent(t);
 
 		Vector3 binormal = Vector3.Cross(Vector3.up, tangent).normalized;
 		Vector3 normal = Vector3.Cross(tangent, binormal);
@@ -106,6 +118,8 @@ public struct CatmullRomSpline {
 		Point p = new Point();
 		p.position = position;
 		p.orientation = orientation;
+		p.index = index;
+		p.len = len;
 		return p;
 	}
 
@@ -122,7 +136,7 @@ public struct CatmullRomSpline {
 				return t;
 			}
 
-			float df = Tangent(t).magnitude;
+			float df = GetTangent(t).magnitude;
 
 			float tCandidate = t - (f / df);
 
@@ -148,14 +162,14 @@ public struct CatmullRomSpline {
 		float MAX_ITERATIONS = 10;
 
 		for(int i = 0; i < MAX_ITERATIONS; i++) {
-			Vector3 position = Position(t);
+			Vector3 position = GetPosition(t);
 			float f = (position - c).sqrMagnitude - (r * r);
 
 			if(Mathf.Abs(f) < 0.001f) {
 				return t;
 			}
 
-			Vector3 tangent = Tangent(t);
+			Vector3 tangent = GetTangent(t);
 			float df = 2f * (((position.x - c.x) * tangent.x) + ((position.y - c.y) * tangent.y) + ((position.z - c.z) * tangent.z));
 
 			t -= f / df;
@@ -172,33 +186,22 @@ public struct CatmullRomSpline {
 	public IEnumerable<Point> Sample(int points) {
 		float arcLen = ArcLength(1f);
 
-		Point p = GetPoint(0f);
-		p.index = 0;
-		p.len = 0f;
-		yield return p;
+		yield return GetPoint(0f, 0, 0f);
 
 		for(int n = 1; n < points - 1; n++) {
 			float s = (n / (points - 1f)) * arcLen;
 
-			Point q = GetPoint(GetCurveParameter(s));
-			q.index = n;
-			q.len = s;
-			yield return q;
+			yield return GetPoint(GetCurveParameter(s), n, s);
 		}
 
-		p = GetPoint(1f);
-		p.index = points;
-		p.len = arcLen;
-		yield return p;
+		yield return GetPoint(1f, points, arcLen);
 	}
 
 
 	public IEnumerable<Point> SampleUnparameterized(int len) {
 		for(int n = 0; n < len; n++) {
 			float t = (float)n / (len - 1);
-			Point p = GetPoint(t);
-			p.index = n;
-			yield return p;
+			yield return GetPoint(t, n, 0f);
 		}
 	}
 }
