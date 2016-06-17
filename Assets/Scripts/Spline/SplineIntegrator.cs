@@ -89,30 +89,28 @@ namespace Spline {
 			return Quaternion.LookRotation(tangent, normal);
 		}
 
-		public void UpdateTransform(float s, Transform transform) {
-			if(s < 0f || s > _spline.ArcLength) {
-				return;
-			}
+		public SplinePoint GetPoint(float s) {
+			s = Mathf.Clamp(s, 0f, _spline.ArcLength);
 
 			CatmullRomSpline spline = _spline.CurveAtArcLength(s);
 
 			float t = spline.GetCurveParameter(spline.GlobalToLocal(s));
-			transform.position = spline.GetPosition(t);
-			transform.rotation = spline.GetRotation(t, Vector3.up);
+
+			SplinePoint p = new SplinePoint();
+			p.position = spline.GetPosition(t);
+			p.rotation = spline.GetRotation(t, Vector3.up);
+			return p;
 		}
 
-		public void UpdateTransformTrailing(float s, float trail, Transform transform) {
-			if(s < 0f || s > _spline.ArcLength) {
-				return;
-			}
+		public SplinePoint GetPointTrailing(float s, Vector3 c, float trail) {
+			s = Mathf.Clamp(s, 0f, _spline.ArcLength);
 
-			CatmullRomSpline spline = _spline.CurveAtArcLength(s);
-			float tc = spline.GetCurveParameter(spline.GlobalToLocal(s));
+			float t = CircleIntersection(c, trail, (s - trail) / _spline.ArcLength);
 
-			float t = CircleIntersection(spline.GetPosition(tc), trail, (s - trail) / _spline.ArcLength);
-
-			transform.position = _spline.GetPositionContinuous(t);
-			transform.rotation = GetRotation(t, Vector3.up);
+			SplinePoint p = new SplinePoint();
+			p.position = _spline.GetPositionContinuous(t);
+			p.rotation = GetRotation(t, Vector3.up);
+			return p;
 		}
 
 	}
