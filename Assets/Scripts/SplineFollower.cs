@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Spline;
 
 public class SplineFollower : MonoBehaviour {
 
 	public float speed = 0.5f;
-	public EditableSpline spline;
+	public SplineIntegrator spline;
 	public float trail = 0f;
 
 	private float distance = 0f;

@@ -158,7 +158,9 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 58356878}
+  - 114: {fileID: 58356881}
   - 114: {fileID: 58356879}
+  - 114: {fileID: 58356880}
   m_Layer: 0
   m_Name: track
   m_TagString: Untagged
@@ -195,6 +197,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a42fb1e294278ff43b808ca15f16821c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sectionPrefab: {fileID: 183478, guid: f4a2ed2586508204ea781541df89cbc6, type: 2}
+--- !u!114 &58356880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 58356877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac2016ad854c03b4f9e6673f35a3cf07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &58356881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 58356877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 860f43b2d1305854fb678fb385919fdf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   points:
   - {fileID: 1335656796}
   - {fileID: 1855980649}
@@ -202,7 +227,6 @@ MonoBehaviour:
   - {fileID: 23039071}
   - {fileID: 1607642755}
   - {fileID: 887548363}
-  sectionPrefab: {fileID: 183478, guid: f4a2ed2586508204ea781541df89cbc6, type: 2}
 --- !u!1 &112854330
 GameObject:
   m_ObjectHideFlags: 0
@@ -592,7 +616,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
-  spline: {fileID: 58356879}
+  spline: {fileID: 58356880}
   trail: 15
 --- !u!23 &846374326
 MeshRenderer:
@@ -1363,7 +1387,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
-  spline: {fileID: 58356879}
+  spline: {fileID: 58356880}
   trail: 0
 --- !u!23 &2057591566
 MeshRenderer:

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Spline;
 
 public class SplineSelector : MonoBehaviour {
 
@@ -9,9 +10,11 @@ public class SplineSelector : MonoBehaviour {
 			RaycastHit hit;
 			if (Physics.Raycast (ray, out hit, 1000) && hit.collider.gameObject.CompareTag("spline")) {
 				Transform segment = hit.collider.transform.parent;
-				EditableSpline spline = segment.parent.GetComponent<EditableSpline>();
+				EditableSpline editor = segment.parent.GetComponent<EditableSpline>();
+				CompositeSpline spline = segment.parent.GetComponent<CompositeSpline>();
+
 				int offset = spline.points.IndexOf(segment);
-				spline.AddSection(offset + 1);
+				editor.AddSection(offset + 1);
 			}
 		}
 	}

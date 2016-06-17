@@ -153,7 +153,7 @@ public class Extrude : MonoBehaviour {
 		spline.p3 = d.position;
 
 		Vector3 q = Vector3.zero;
-		foreach(CatmullRomSpline.Point p in spline.Sample(10)) {
+		foreach(CatmullRomSpline.Point p in spline.SampleUnparameterized(10)) {
 			if(q == Vector3.zero) {
 				q = p.position;
 				continue;

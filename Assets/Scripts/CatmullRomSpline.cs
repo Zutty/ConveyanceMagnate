@@ -30,6 +30,7 @@ public struct CatmullRomSpline {
 
 	private CubicPolynomial3 basis;
 	private QuadraticPolynomial3 derivative;
+	private float _arcLength;
 
 	public void CalculateBasis() {
 		float dt0 = Mathf.Sqrt(Vector3.Distance(p0, p1));
@@ -63,6 +64,8 @@ public struct CatmullRomSpline {
 		derivative.a = 6 * p1 - 6 * p2 + 3 * m1 + 3 * m2;
 		derivative.b = -6 * p1 + 6 * p2 - 4 * m1 - 2 * m2;
 		derivative.c = m1;
+
+		_arcLength = ArcLength(1f);
 	}
 
 	public Vector3 GetPosition(float t) {
@@ -73,18 +76,22 @@ public struct CatmullRomSpline {
 		return derivative.Solve(t);
 	}
 
+	public float Length {
+		get { return _arcLength; }
+	}
+
 	public float ArcLength(float tmax) {
-		float prev = derivative.c.magnitude;
+		float prev = GetTangent(0f).magnitude;
 
 		float sum = 0f;
 		for(int i = 1; i <= 10; i++) {
 			float t = (i / 10f) * tmax;
 
-			Vector3 tangent = GetTangent(t);
+			float f = GetTangent(t).magnitude;
 
-			sum += (t - (((i - 1) / 10f) * tmax)) * (prev + tangent.magnitude);
+			sum += tmax * (prev + f) / 10f;
 
-			prev = tangent.magnitude;
+			prev = f;
 		}
 
 		return  sum / 2f;
@@ -124,8 +131,7 @@ public struct CatmullRomSpline {
 	}
 
 	public float GetCurveParameter(float s) {
-		float arcLen = ArcLength(1f);
-		float t = s / arcLen; // Initial guess
+		float t = s / Length; // Initial guess
 
 		float lower = 0f, upper = 1f;
 		float MAX_ITERATIONS = 10;
@@ -153,48 +159,16 @@ public struct CatmullRomSpline {
 		return t;
 	}
 
-	public float CircleIntersectionGuess(float s, float r) {
-		return (s - r) / ArcLength(1f);
-	}
-
-	public float CircleIntersection(Vector3 c, float r, float initial) {
-		float t = initial;
-		float MAX_ITERATIONS = 10;
-
-		for(int i = 0; i < MAX_ITERATIONS; i++) {
-			Vector3 position = GetPosition(t);
-			float f = (position - c).sqrMagnitude - (r * r);
-
-			if(Mathf.Abs(f) < 0.001f) {
-				return t;
-			}
-
-			Vector3 tangent = GetTangent(t);
-			float df = 2f * (((position.x - c.x) * tangent.x) + ((position.y - c.y) * tangent.y) + ((position.z - c.z) * tangent.z));
-
-			t -= f / df;
-
-			if(t < 0f || t > 1f) {
-				return 0;
-			}
-		}
-
-		Debug.LogWarning("Root was not found after " + MAX_ITERATIONS + " iterations");
-		return t;
-	}
-
 	public IEnumerable<Point> Sample(int points) {
-		float arcLen = ArcLength(1f);
-
 		yield return GetPoint(0f, 0, 0f);
 
 		for(int n = 1; n < points - 1; n++) {
-			float s = (n / (points - 1f)) * arcLen;
+			float s = (n / (points - 1f)) * Length;
 
 			yield return GetPoint(GetCurveParameter(s), n, s);
 		}
 
-		yield return GetPoint(1f, points, arcLen);
+		yield return GetPoint(1f, points, Length);
 	}
 
 

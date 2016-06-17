@@ -1,89 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Spline;
 
-public class EditableSpline : MonoBehaviour, IEnumerable<CatmullRomSpline> {
+public class EditableSpline : MonoBehaviour {
 
-	public List<Transform> points;
 	public GameObject sectionPrefab;
 
-	public CatmullRomSpline this[int offset] {
-		get { 
-			CatmullRomSpline spline = new CatmullRomSpline();
-			spline.p0 = points[offset].position;
-			spline.p1 = points[offset + 1].position;
-			spline.p2 = points[offset + 2].position;
-			spline.p3 = points[offset + 3].position;
-			spline.CalculateBasis();
-			return spline;
-		}
-	}
+	private CompositeSpline _spline;
 
-	public int Length {
-		get { return points.Count - 3; }
-	}
-
-	public IEnumerator<CatmullRomSpline> GetEnumerator() {
-		for(int offset = 0; offset < this.Length; offset++) {
-			yield return this[offset];
-		}
-	}
-
-	IEnumerator IEnumerable.GetEnumerator() {
-		return GetEnumerator();
-	}
-
-	public void UpdateTransform(float distance, Transform transform) {
-		float s = distance;
-		float len = 0;
-		int offset;
-
-		for(offset = 0; offset < Length; offset++) {
-			s -= len;
-
-			len = this[offset].ArcLength(1f);
-
-			if(s < len) {
-				break;
-			}
-		}
-
-		if(s > len) {
-			return;
-		}
-
-		CatmullRomSpline spline = this[offset];
-
-		float t = spline.GetCurveParameter(s);
-		transform.position = spline.GetPosition(t);
-		transform.rotation = spline.GetRotation(t, Vector3.up);
-	}
-
-	public void UpdateTransformTrailing(float distance, float trail, Transform transform) {
-		float s = distance;
-		float len = 0;
-		int offset;
-
-		for(offset = 0; offset < Length; offset++) {
-			s -= len;
-
-			len = this[offset].ArcLength(1f);
-
-			if(s < len) {
-				break;
-			}
-		}
-
-		if(s > len) {
-			return;
-		}
-
-		CatmullRomSpline spline = this[offset];
-
-		float t = spline.CircleIntersection(spline.GetPosition(spline.GetCurveParameter(s)), trail, spline.CircleIntersectionGuess(s, trail));
-
-		transform.position = spline.GetPosition(t);
-		transform.rotation = spline.GetRotation(t, Vector3.up);
+	public void Start() {
+		_spline = GetComponent<CompositeSpline>();
 	}
 
 	public void OnDrawGizmos() {
@@ -95,39 +22,39 @@ public class EditableSpline : MonoBehaviour, IEnumerable<CatmullRomSpline> {
 	}
 
 	public void AddSection(int offset) {
-		if(offset < 1 || offset > points.Count - 2) {
+		if(offset < 1 || offset > _spline.points.Count - 2) {
 			throw new UnityException();
 		}
 
-		Vector3 position = (points[offset].position + points[offset - 1].position) / 2;
-		Quaternion rotation = Quaternion.LookRotation(points[offset].position - points[offset - 1].position);
+		Vector3 position = (_spline.points[offset].position + _spline.points[offset - 1].position) / 2;
+		Quaternion rotation = Quaternion.LookRotation(_spline.points[offset].position - _spline.points[offset - 1].position);
 
 		GameObject newSection = (GameObject)Instantiate(sectionPrefab, position, rotation);
 		newSection.transform.parent = transform;
 
-		points.Insert(offset, newSection.transform);
+		_spline.points.Insert(offset, newSection.transform);
 
 		for(int i = Mathf.Max(1, offset - 2); i <= offset + 1; i++) {
-			Extrude extrude = points[i].GetComponent<Extrude>();
-			extrude.a = points[i - 1];
-			extrude.b = points[i];
-			extrude.c = points[i + 1];
-			extrude.d = points[i + 2];
+			Extrude extrude = _spline.points[i].GetComponent<Extrude>();
+			extrude.a = _spline.points[i - 1];
+			extrude.b = _spline.points[i];
+			extrude.c = _spline.points[i + 1];
+			extrude.d = _spline.points[i + 2];
 		}
 
 		if(offset < 3) {
-			FollowTangent followTangent = points[0].GetComponent<FollowTangent>();
-			followTangent.target = points[1];
-			followTangent.tangent = points[2];
+			FollowTangent followTangent = _spline.points[0].GetComponent<FollowTangent>();
+			followTangent.target = _spline.points[1];
+			followTangent.tangent = _spline.points[2];
 		}
-		if(offset >= points.Count - 4) {
-			FollowTangent followTangent = points[points.Count - 1].GetComponent<FollowTangent>();
-			followTangent.target = points[points.Count - 2];
-			followTangent.tangent = points[points.Count - 3];
+		if(offset >= _spline.points.Count - 4) {
+			FollowTangent followTangent = _spline.points[_spline.points.Count - 1].GetComponent<FollowTangent>();
+			followTangent.target = _spline.points[_spline.points.Count - 2];
+			followTangent.tangent = _spline.points[_spline.points.Count - 3];
 		}
 	}
 
 	public void AddSectionAtEnd() {
-		AddSection(points.Count - 2);
+		AddSection(_spline.points.Count - 2);
 	}
 }
