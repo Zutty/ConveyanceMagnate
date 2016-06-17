@@ -31,8 +31,9 @@ public struct CatmullRomSpline {
 	private CubicPolynomial3 basis;
 	private QuadraticPolynomial3 derivative;
 	private float _arcLength;
+	private float _arcOffset;
 
-	public void CalculateBasis() {
+	public void CalculateBasis(float arcOffset) {
 		float dt0 = Mathf.Sqrt(Vector3.Distance(p0, p1));
 		float dt1 = Mathf.Sqrt(Vector3.Distance(p1, p2));
 		float dt2 = Mathf.Sqrt(Vector3.Distance(p2, p3));
@@ -66,6 +67,7 @@ public struct CatmullRomSpline {
 		derivative.c = m1;
 
 		_arcLength = ArcLength(1f);
+		_arcOffset = arcOffset;
 	}
 
 	public Vector3 GetPosition(float t) {
@@ -78,6 +80,14 @@ public struct CatmullRomSpline {
 
 	public float Length {
 		get { return _arcLength; }
+	}
+
+	public bool IsWithinArc(float s) {
+		return s > _arcOffset && s <= _arcOffset + _arcLength;
+	}
+
+	public float GlobalToLocal(float s) {
+		return s - _arcOffset;
 	}
 
 	public float ArcLength(float tmax) {

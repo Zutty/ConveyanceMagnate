@@ -14,34 +14,12 @@ namespace Spline {
 			get { return (float)_spline.Length; }
 		}
 
-		public float ArcLength(float tmin, float tmax, int steps) {
-			// Integrate numerically by Trapezium rule
-			float prev = _spline.GetTangentContinuous(tmin).magnitude;
-
-			float sum = 0f;
-			for(int i = 1; i <= steps; i++) {
-				float t = tmin + ((i / (float)steps) * (tmax - tmin));
-
-				float f = _spline.GetTangentContinuous(t).magnitude;
-
-				sum += (tmax - tmin) * (prev + f) / (float)steps;
-
-				prev = f;
-			}
-
-			return  sum / 2f;
-		}
-
 		public float ArcLength(float t) {
-			return ArcLength(0f, t, Mathf.RoundToInt(t * 10f));
-		}
-
-		public float ArcLength() {
-			return ArcLength(Tmax);
+			return _spline.CurveAtParameter(t).ArcLength(t);
 		}
 
 		public float CurveParameter(float s) {
-			float t = s / ArcLength(); // Initial guess
+			float t = s / _spline.ArcLength;
 
 			float lower = 0f, upper = Tmax;
 			int MAX_ITERATIONS = 10;
@@ -112,23 +90,26 @@ namespace Spline {
 		}
 
 		public void UpdateTransform(float s, Transform transform) {
-			if(s < 0f) {
+			if(s < 0f || s > _spline.ArcLength) {
 				return;
 			}
 
 			CatmullRomSpline spline = _spline.CurveAtArcLength(s);
 
-			float t = spline.GetCurveParameter(s);
+			float t = spline.GetCurveParameter(spline.GlobalToLocal(s));
 			transform.position = spline.GetPosition(t);
 			transform.rotation = spline.GetRotation(t, Vector3.up);
 		}
 
 		public void UpdateTransformTrailing(float s, float trail, Transform transform) {
-			if(s < 0f || s > ArcLength()) {
+			if(s < 0f || s > _spline.ArcLength) {
 				return;
 			}
 
-			float t = 0f;//CircleIntersection(_spline.GetPositionContinuous(CurveParameter(sc)), r, (sc - r) / ArcLength());
+			CatmullRomSpline spline = _spline.CurveAtArcLength(s);
+			float tc = spline.GetCurveParameter(spline.GlobalToLocal(s));
+
+			float t = CircleIntersection(spline.GetPosition(tc), trail, (s - trail) / _spline.ArcLength);
 
 			transform.position = _spline.GetPositionContinuous(t);
 			transform.rotation = GetRotation(t, Vector3.up);

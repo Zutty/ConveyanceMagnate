@@ -7,10 +7,14 @@ namespace Spline {
 		public List<Transform> points;
 
 		private List<CatmullRomSpline> _curves = new List<CatmullRomSpline>();
-		private List<float> _arcLengthLUT = new List<float>();
+		private float _arcLength;
 
 		public int Length {
 			get { return _curves.Count; }
+		}
+
+		public float ArcLength {
+			get { return _arcLength; }
 		}
 
 		public void Start() {
@@ -35,7 +39,6 @@ namespace Spline {
 		private void RecalculateCurves() {
 			Debug.Log("Recalculating...");
 			_curves.Clear();
-			_arcLengthLUT.Clear();
 
 			float len = 0;
 			for(int offset = 0; offset < points.Count - 3; offset++) {
@@ -44,18 +47,22 @@ namespace Spline {
 				spline.p1 = points[offset + 1].position;
 				spline.p2 = points[offset + 2].position;
 				spline.p3 = points[offset + 3].position;
-				spline.CalculateBasis();
+				spline.CalculateBasis(len);
 				_curves.Add(spline);
 
 				len += spline.Length;
-				_arcLengthLUT.Add(len);
 			}
+			_arcLength = len;
 			Debug.Log("  _curves.Count = "+_curves.Count);
+		}
+
+		public CatmullRomSpline CurveAtParameter(float t) {
+			return _curves [(int)Mathf.Clamp (Mathf.Floor (t), 0, _curves.Count - 1)];
 		}
 
 		public CatmullRomSpline CurveAtArcLength(float s) {
 			for(int i = 0; i < _curves.Count; i++) {
-				if(s < _arcLengthLUT[i]) {
+				if(_curves[i].IsWithinArc(s)) {
 					return _curves[i];
 				}
 			}
@@ -63,11 +70,11 @@ namespace Spline {
 		}
 
 		public Vector3 GetPositionContinuous(float t) {
-			return _curves[(int)Mathf.Clamp(Mathf.Floor(t), 0, _curves.Count - 1)].GetPosition(t - Mathf.Floor(t));
+			return CurveAtParameter(t).GetPosition(t - Mathf.Floor(t));
 		}
 
 		public Vector3 GetTangentContinuous(float t) {
-			return _curves[(int)Mathf.Clamp(Mathf.Floor(t), 0, _curves.Count - 1)].GetTangent(t - Mathf.Floor(t));
+			return CurveAtParameter(t).GetTangent(t - Mathf.Floor(t));
 		}
 	}
 }
