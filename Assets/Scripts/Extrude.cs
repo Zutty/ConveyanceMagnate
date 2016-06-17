@@ -95,7 +95,7 @@ public class Extrude : MonoBehaviour {
 		spline.p2.y += elevation;
 		spline.p3.y += elevation;
 
-		spline.CalculateBasis();
+		spline.CalculateBasis(0f);
 	}
 
 	void Recalculate() {
