@@ -69,6 +69,15 @@ namespace Spline {
 			throw new UnityException();
 		}
 
+		public float GetCurveParameter(float s) {
+			for(int i = 0; i < _curves.Count; i++) {
+				if(_curves[i].IsWithinArc(s)) {
+					return (float)i + _curves[i].GetCurveParameter(_curves[i].GlobalToLocal(s));
+				}
+			}
+			throw new UnityException("s " + s + " not valid");
+		}
+
 		public Vector3 GetPositionContinuous(float t) {
 			return CurveAtParameter(t).GetPosition(t - Mathf.Floor(t));
 		}

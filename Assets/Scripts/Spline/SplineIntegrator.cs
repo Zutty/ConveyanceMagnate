@@ -49,8 +49,8 @@ namespace Spline {
 			return t;
 		}
 
-		public float CircleIntersection(Vector3 c, float r, float initial) {
-			float t = initial;
+		public float CircleIntersection(Vector3 c, float r, float lower, float upper) {
+			float t = (lower + upper) / 2f;
 			float MAX_ITERATIONS = 10;
 			float lastf = 0f;
 
@@ -73,7 +73,7 @@ namespace Spline {
 				}
 			}
 
-			Debug.LogWarning("Circle intersection [c = " + c + ", r = " + r + ", initial = " + initial + "] root was not found after " + MAX_ITERATIONS + " iterations <"+lastf+"; "+t+">");
+			Debug.LogWarning("Circle intersection [c = " + c + ", r = " + r + ", lower = " + lower + ", upper = " + upper + "] root was not found after " + MAX_ITERATIONS + " iterations <"+lastf+"; "+t+">");
 			return t;
 		}
 
@@ -105,13 +105,18 @@ namespace Spline {
 		public SplinePoint GetPointTrailing(float s, Vector3 c, float trail) {
 			s = Mathf.Clamp(s, 0f, _spline.ArcLength);
 
-			float t = CircleIntersection(c, trail, (s - trail) / _spline.ArcLength);
+			float MINIMUM_CURVE_RADIUS = 30f;
+			float minArc = 2f * MINIMUM_CURVE_RADIUS * Mathf.Asin(trail / (2f * MINIMUM_CURVE_RADIUS));
+
+			float lowerBound = _spline.GetCurveParameter(s - minArc);
+			float upperBound = _spline.GetCurveParameter(s - trail);
+
+			float t = CircleIntersection(c, trail, lowerBound, upperBound);
 
 			SplinePoint p = new SplinePoint();
 			p.position = _spline.GetPositionContinuous(t);
 			p.rotation = GetRotation(t, Vector3.up);
 			return p;
 		}
-
 	}
 }
