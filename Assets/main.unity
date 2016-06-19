@@ -778,11 +778,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47c07f56f902849f4a07a6c523406ced, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 1
+  speed: 15
   spline: {fileID: 58356880}
   frontFollower: {fileID: 2106693407}
   rearFollower: {fileID: 384301078}
   baseLength: 15
+  bufferLength: 2
 --- !u!1001 &1003880641
 Prefab:
   m_ObjectHideFlags: 0
