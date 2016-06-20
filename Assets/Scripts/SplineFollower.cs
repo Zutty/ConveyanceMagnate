@@ -1,28 +1,39 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using Spline;
 
 public class SplineFollower : MonoBehaviour {
 
 	public float speed = 0.5f;
 	public SplineIntegrator spline;
-	public Transform frontFollower;
-	public Transform rearFollower;
-	public float baseLength;
-	public float bufferLength = 2f;
+	public List<SplineFollowerUnit> units;
+	public float coupleDistance = 0f;
 
 	private float distance = 0f;
 	private bool _move = false;
+	private float _straightLength;
+
+	public float straightLength {
+		get { return _straightLength; }
+	}
 
 	public void Start() {
-		distance = baseLength + bufferLength;
+		CalculateLength();
+		distance = _straightLength;
 		Move();
+	}
+
+	private void CalculateLength() {
+		_straightLength = coupleDistance * (units.Count - 1f);
+		for(int i = 0; i < units.Count; i++) {
+			_straightLength += units[i].straightLength;
+		}
 	}
 
 	public void Update () {
 		if(Input.GetKey(KeyCode.M)) {
 			_move = true;
-			distance = baseLength + bufferLength;
+			distance = _straightLength;
 		}
 		if(_move) {
 			Move();
@@ -32,16 +43,28 @@ public class SplineFollower : MonoBehaviour {
 	public void Move() {
 		distance += speed * Time.deltaTime;
 
-		SplinePoint front = spline.GetPoint(distance);
-		SplinePoint rear = spline.GetPointTrailing(distance, front.position, baseLength);
+		Vector3 com = Vector3.zero;
+		float unitPosition = distance;
 
-		frontFollower.position = front.position;
-		frontFollower.rotation = front.rotation;
+		for(int i = 0; i < units.Count; i++) {
+			unitPosition -= units[i].bufferLength;
+				
+			SplinePoint front = spline.GetPoint(unitPosition);
+			SplinePoint rear = spline.GetPointTrailing(unitPosition, front.position, units[i].baseLength);
 
-		rearFollower.position = rear.position;
-		rearFollower.rotation = rear.rotation;
+			units[i].frontFollower.position = front.position;
+			units[i].frontFollower.rotation = front.rotation;
 
-		transform.position = (front.position + rear.position) / 2f;
-		transform.rotation = Quaternion.LookRotation(front.position - rear.position);
+			units[i].rearFollower.position = rear.position;
+			units[i].rearFollower.rotation = rear.rotation;
+
+			units[i].transform.position = (front.position + rear.position) / 2f;
+			units[i].transform.rotation = Quaternion.LookRotation(front.position - rear.position);
+
+			com += units[i].transform.position;
+			unitPosition = spline.ArcLength(rear.t) - (units[i].bufferLength + coupleDistance);
+		}
+
+		transform.position = com / (float)units.Count;
 	}
 }

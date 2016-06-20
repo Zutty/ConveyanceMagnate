@@ -15,7 +15,8 @@ namespace Spline {
 		}
 
 		public float ArcLength(float t) {
-			return _spline.CurveAtParameter(t).ArcLength(t);
+			CatmullRomSpline spline = _spline.CurveAtParameter(t);
+			return spline.LocalToGlobal(spline.ArcLength(t - Mathf.Floor(t)));
 		}
 
 		public float CurveParameter(float s) {
@@ -99,6 +100,7 @@ namespace Spline {
 			SplinePoint p = new SplinePoint();
 			p.position = spline.GetPosition(t);
 			p.rotation = spline.GetRotation(t, Vector3.up);
+			p.t = t;
 			return p;
 		}
 
@@ -116,6 +118,7 @@ namespace Spline {
 			SplinePoint p = new SplinePoint();
 			p.position = _spline.GetPositionContinuous(t);
 			p.rotation = GetRotation(t, Vector3.up);
+			p.t = t;
 			return p;
 		}
 	}

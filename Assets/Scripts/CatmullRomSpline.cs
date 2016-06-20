@@ -90,6 +90,10 @@ public struct CatmullRomSpline {
 		return s - _arcOffset;
 	}
 
+	public float LocalToGlobal(float s) {
+		return s + _arcOffset;
+	}
+
 	public float ArcLength(float tmax) {
 		float prev = GetTangent(0f).magnitude;
 
