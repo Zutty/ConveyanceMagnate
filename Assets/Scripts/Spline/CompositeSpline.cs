@@ -53,23 +53,27 @@ namespace Spline {
 				len += spline.Length;
 			}
 			_arcLength = len;
-			Debug.Log("  _curves.Count = "+_curves.Count);
+			Debug.Log("  _curves.Count = " + _curves.Count);
 		}
 
 		public CatmullRomSpline CurveAtParameter(float t) {
-			return _curves [(int)Mathf.Clamp (Mathf.Floor (t), 0, _curves.Count - 1)];
+			CheckT(t);
+			return _curves[(int)Mathf.Clamp(Mathf.Floor(t), 0, _curves.Count - 1)];
 		}
 
 		public CatmullRomSpline CurveAtArcLength(float s) {
+			CheckS(s);
 			for(int i = 0; i < _curves.Count; i++) {
 				if(_curves[i].IsWithinArc(s)) {
 					return _curves[i];
 				}
 			}
-			throw new UnityException();
+			throw new UnityException("s " + s + " not valid");
 		}
 
 		public float GetCurveParameter(float s) {
+			CheckS(s);
+
 			for(int i = 0; i < _curves.Count; i++) {
 				if(_curves[i].IsWithinArc(s)) {
 					return (float)i + _curves[i].GetCurveParameter(_curves[i].GlobalToLocal(s));
@@ -79,11 +83,25 @@ namespace Spline {
 		}
 
 		public Vector3 GetPositionContinuous(float t) {
+			CheckT(t);
 			return CurveAtParameter(t).GetPosition(t - Mathf.Floor(t));
 		}
 
 		public Vector3 GetTangentContinuous(float t) {
+			CheckT(t);
 			return CurveAtParameter(t).GetTangent(t - Mathf.Floor(t));
+		}
+
+		private void CheckT(float t) {
+			if(t < 0f || t > (float)Length) {
+				throw new UnityException("t " + t + " is not within parameter bounds");
+			}
+		}
+
+		private void CheckS(float s) {
+			if(s < 0f || s > ArcLength) {
+				throw new UnityException("s " + s + " is not within arc length");
+			}
 		}
 	}
 }

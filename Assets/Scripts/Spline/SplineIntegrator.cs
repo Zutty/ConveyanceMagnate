@@ -90,7 +90,7 @@ namespace Spline {
 		}
 
 		public SplinePoint GetPoint(float s) {
-			s = Mathf.Clamp(s, 0f, _spline.ArcLength);
+			s = Mathf.Clamp(s, 0f, _spline.ArcLength - 1f);
 
 			CatmullRomSpline spline = _spline.CurveAtArcLength(s);
 
