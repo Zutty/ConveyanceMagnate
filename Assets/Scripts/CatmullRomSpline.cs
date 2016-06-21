@@ -70,6 +70,28 @@ public struct CatmullRomSpline {
 		_arcOffset = arcOffset;
 	}
 
+	public SexticPolynomialf CircleIntersection(Vector3 o, float r) {
+		SexticPolynomialf intersection = new SexticPolynomialf();
+
+		// a^2t^6
+		intersection.a = (basis.a.x * basis.a.x) + (basis.a.y * basis.a.y) + (basis.a.z * basis.a.z);
+		// 2abt^5
+		intersection.b = 2f * ((basis.a.x * basis.b.x) + (basis.a.y * basis.b.y) + (basis.a.z * basis.b.z));
+		// (2ac + b^2)t^4
+		intersection.c = 2f * ((basis.a.x * basis.c.x) + (basis.a.y * basis.c.y) + (basis.a.z * basis.c.z)) + (basis.b.x * basis.b.x) + (basis.b.y * basis.b.y) + (basis.b.z * basis.b.z);
+
+		// (2(ad+bc) - 2ao)t^3
+		intersection.d = 2f * ((basis.a.x * basis.d.x) + (basis.a.y * basis.d.y) + (basis.a.z * basis.d.z) + (basis.b.x * basis.c.x) + (basis.b.y * basis.c.y) + (basis.b.z * basis.c.z));
+		// (2(bd+c^2) - 2bo)t^2
+		intersection.e = (2f * ((basis.b.x * basis.d.x) + (basis.b.y * basis.d.y) + (basis.b.z * basis.d.z))) + (basis.c.x * basis.c.x) + (basis.c.y * basis.c.y) + (basis.c.z * basis.c.z) - (2f * ((basis.b.x * o.x) + (basis.b.y * o.y) + (basis.b.z * o.z)));
+		// (2cd - 2co)t
+		intersection.f = 2f * ((basis.c.x * basis.d.x) + (basis.c.y * basis.d.y) + (basis.c.z * basis.d.z)) - 2f * ((basis.c.x * o.x) + (basis.c.y * o.y) + (basis.c.z * o.z));
+		// d^2 + o^2 - 2do[ - r^2]
+		intersection.g = ((basis.d.x * basis.d.x) + (basis.d.y * basis.d.y) + (basis.d.z * basis.d.z) - 2f * ((basis.d.x * o.x) + (basis.d.y * o.y) + (basis.d.z * o.z)) + (o.x * o.x) + (o.y * o.y) + (o.z * o.z)) - (r * r);
+
+		return intersection;
+	}
+
 	public Vector3 GetPosition(float t) {
 		return basis.Solve(t);
 	}
