@@ -38,6 +38,7 @@ public class Extrude : MonoBehaviour {
 
 		Reposition ();
 		int len = Mathf.CeilToInt(spline.ArcLength(1f) / 2f);
+
 		Resize(len);
 	}
 
@@ -54,8 +55,16 @@ public class Extrude : MonoBehaviour {
 	}
 
 	void Resize(int splineLen) {
-		this.splineLen = splineLen;
+		if(splineLen <= 1) {
+			this.splineLen = 0;
+			triangles = new int[0];
+			vertices = new Vector3[0];
+			normals = new Vector3[0];
+			uv = new Vector2[0];
+			return;
+		}
 
+		this.splineLen = splineLen;
 		int vertexCount = shape.vertices.Length * splineLen;
 		int indexCount = shape.lines.Length * (splineLen - 1) * 3;
 
@@ -99,6 +108,10 @@ public class Extrude : MonoBehaviour {
 	}
 
 	void Recalculate() {
+		if(splineLen == 0) {
+			return;
+		}
+
 		int shapeVertices = shape.vertices.Length;
 
 		int idx = 0, ci = -1;
