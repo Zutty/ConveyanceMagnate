@@ -5,6 +5,8 @@ public class UIStateManager : MonoBehaviour {
 
 	public enum UIState { NORMAL, CREATE_TRACK }
 
+	public GameObject trackPrefab;
+
 	private static UIStateManager _instance;
 
 	private UIState _state = UIState.NORMAL;
@@ -30,6 +32,6 @@ public class UIStateManager : MonoBehaviour {
 	}
 
 	public void TriggerCreateTrack() {
-		_state = UIState.CREATE_TRACK;
+		Instantiate(trackPrefab);
 	}
 }
