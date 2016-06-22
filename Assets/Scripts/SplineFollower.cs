@@ -20,6 +20,7 @@ public class SplineFollower : MonoBehaviour {
 	public void Start() {
 		CalculateLength();
 		distance = _straightLength;
+		_move = true;
 		Move();
 	}
 
@@ -31,10 +32,6 @@ public class SplineFollower : MonoBehaviour {
 	}
 
 	public void Update () {
-		if(Input.GetKey(KeyCode.M)) {
-			_move = true;
-			distance = _straightLength;
-		}
 		if(_move) {
 			Move();
 		}
