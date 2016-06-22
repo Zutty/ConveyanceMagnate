@@ -23,7 +23,7 @@ public class EditableSpline : MonoBehaviour {
 
 	public void AddSection(int offset) {
 		if(offset < 1 || offset > _spline.points.Count - 2) {
-			throw new UnityException();
+			throw new UnityException("Cant add section at offset " + offset);
 		}
 
 		Vector3 position = (_spline.points[offset].position + _spline.points[offset - 1].position) / 2;
@@ -34,7 +34,7 @@ public class EditableSpline : MonoBehaviour {
 
 		_spline.points.Insert(offset, newSection.transform);
 
-		for(int i = Mathf.Max(1, offset - 2); i <= offset + 1; i++) {
+		for(int i = Mathf.Max(1, offset - 2); i <= Mathf.Min(_spline.points.Count - 3, offset + 1); i++) {
 			Extrude extrude = _spline.points[i].GetComponent<Extrude>();
 			extrude.a = _spline.points[i - 1];
 			extrude.b = _spline.points[i];
