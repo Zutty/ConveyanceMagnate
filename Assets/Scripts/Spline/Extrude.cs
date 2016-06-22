@@ -12,15 +12,11 @@ namespace Spline {
 			public int[] lines;
 		}
 
+		public int splineIndex;
 		public Shape shape;
 		public GameObject colliderSegmentPrefab;
 		public float elevation = 0.05f;
-		public Transform a;
-		public Transform b;
-		public Transform c;
-		public Transform d;
 
-		private CatmullRomSpline spline;
 		private Mesh mesh;
 
 		private int splineLen;
@@ -30,26 +26,30 @@ namespace Spline {
 		private Vector2[] uv;
 
 		private List<BoxCollider> _colliderSegments = new List<BoxCollider>();
+		private CompositeSpline _compositeSpline;
 
 		void Start() {
+			_compositeSpline = GetComponentInParent<CompositeSpline>();
 			mesh = GetComponent<MeshFilter>().sharedMesh = new Mesh();
-			spline = new CatmullRomSpline();
 
-			Reposition ();
-			int len = Mathf.CeilToInt(spline.ArcLength(1f) / 2f);
+			Resize(EstimateSplineLen());
+		}
 
-			Resize(len);
+		private CatmullRomSpline spline {
+			get { return _compositeSpline[splineIndex]; }
+		}
+
+		private int EstimateSplineLen() {
+			return Mathf.CeilToInt(spline.ArcLength(1f) / 2f);
 		}
 
 		void Update() {
-			Reposition ();
+			int len = EstimateSplineLen();
 
-			int len = Mathf.CeilToInt(spline.ArcLength(1f) / 2f);
-
-			if (len != splineLen) {
-				Resize (len);
+			if(len != splineLen) {
+				Resize(len);
 			} else {
-				Recalculate ();
+				Recalculate();
 			}
 		}
 
@@ -86,24 +86,10 @@ namespace Spline {
 				_colliderSegments.RemoveRange(splineLen - 1, _colliderSegments.Count - splineLen + 1);
 			}
 			if(splineLen - 1 != _colliderSegments.Count) {
-				Debug.Log("splineLen - 1 = "+(splineLen - 1)+", _colliderSegments.Count = "+_colliderSegments.Count);
+				Debug.Log("splineLen - 1 = " + (splineLen - 1) + ", _colliderSegments.Count = " + _colliderSegments.Count);
 			}
 
 			Recalculate();
-		}
-
-		void Reposition() {
-			spline.p0 = a.position;
-			spline.p1 = b.position;
-			spline.p2 = c.position;
-			spline.p3 = d.position;
-
-			spline.p0.y += elevation;
-			spline.p1.y += elevation;
-			spline.p2.y += elevation;
-			spline.p3.y += elevation;
-
-			spline.CalculateBasis(0f);
 		}
 
 		void Recalculate() {
@@ -154,27 +140,6 @@ namespace Spline {
 			mesh.triangles = triangles;
 			mesh.normals = normals;
 			mesh.uv = uv;
-		}
-
-		void OnDrawGizmos() {
-			Gizmos.color = Color.white;
-
-			spline.p0 = a.position;
-			spline.p1 = b.position;
-			spline.p2 = c.position;
-			spline.p3 = d.position;
-
-			Vector3 q = Vector3.zero;
-			foreach(CatmullRomSpline.Point p in spline.SampleUnparameterized(10)) {
-				if(q == Vector3.zero) {
-					q = p.position;
-					continue;
-				}
-
-				Gizmos.DrawLine(p.position, q);
-
-				q = p.position;
-			}
 		}
 	}
 }

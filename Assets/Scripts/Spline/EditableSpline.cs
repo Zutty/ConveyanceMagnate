@@ -32,14 +32,12 @@ namespace Spline {
 			GameObject newSection = (GameObject)Instantiate(sectionPrefab, position, rotation);
 			newSection.transform.parent = transform;
 
-			_spline.points.Insert(offset, newSection.transform);
+			_spline.AddPoint(newSection.transform, offset);
 
-			for(int i = Mathf.Max(1, offset - 2); i <= Mathf.Min(_spline.points.Count - 3, offset + 1); i++) {
+			for(int i = 1; i < _spline.points.Count - 2; i++) {
 				Extrude extrude = _spline.points[i].GetComponent<Extrude>();
-				extrude.a = _spline.points[i - 1];
-				extrude.b = _spline.points[i];
-				extrude.c = _spline.points[i + 1];
-				extrude.d = _spline.points[i + 2];
+				extrude.splineIndex = i - 1;
+				_spline.points[i].name = "track_segment_" + i;
 			}
 
 			if(offset < 3) {

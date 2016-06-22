@@ -128,6 +128,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.4273529, y: 0, z: 39.298378}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 470260}
   m_RootOrder: 0
@@ -140,6 +141,7 @@ Transform:
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071067}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 499254}
   m_RootOrder: 0
@@ -152,6 +154,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.3, y: 0, z: 34.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 467154}
   m_Father: {fileID: 470260}
@@ -165,6 +168,7 @@ Transform:
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071067}
   m_LocalPosition: {x: -0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 456556}
   m_RootOrder: 0
@@ -177,6 +181,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 110.152405, y: 0, z: -83.514404}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 412830}
   - {fileID: 456556}
@@ -193,6 +198,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.62734985, y: 0, z: -2.0983734}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 470260}
   m_RootOrder: 3
@@ -205,6 +211,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.5, y: 0, z: 2.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 455928}
   m_Father: {fileID: 470260}
@@ -292,6 +299,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16ce226ffad303c4596d4e018710f798, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  splineIndex: 0
   shape:
     vertices:
     - {x: 1, y: 0}
@@ -354,10 +362,6 @@ MonoBehaviour:
   colliderSegmentPrefab: {fileID: 127172, guid: 25e05ef77ad6e2a4e992b2d99166f308,
     type: 2}
   elevation: 0.05
-  a: {fileID: 412830}
-  b: {fileID: 456556}
-  c: {fileID: 499254}
-  d: {fileID: 481096}
 --- !u!114 &11428926
 MonoBehaviour:
   m_ObjectHideFlags: 1

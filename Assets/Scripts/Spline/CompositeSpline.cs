@@ -21,6 +21,10 @@ namespace Spline {
 			RecalculateCurves();
 		}
 
+		public CatmullRomSpline this[int index] {
+			get { return _curves[index]; }
+		}
+
 		public void Update() {
 			bool recalculate = false;
 
@@ -34,6 +38,11 @@ namespace Spline {
 			if(recalculate) {
 				RecalculateCurves();
 			}
+		}
+
+		public void AddPoint(Transform point, int index) {
+			points.Insert(index, point);
+			RecalculateCurves();
 		}
 
 		private void RecalculateCurves() {
