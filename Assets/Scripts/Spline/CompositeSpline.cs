@@ -37,7 +37,6 @@ namespace Spline {
 		}
 
 		private void RecalculateCurves() {
-			Debug.Log("Recalculating...");
 			_curves.Clear();
 
 			float len = 0;
@@ -53,7 +52,6 @@ namespace Spline {
 				len += spline.Length;
 			}
 			_arcLength = len;
-			Debug.Log("  _curves.Count = " + _curves.Count);
 		}
 
 		public CatmullRomSpline CurveAtParameter(float t) {

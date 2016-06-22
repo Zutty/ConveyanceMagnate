@@ -32,9 +32,7 @@ public class Extrude : MonoBehaviour {
 
 	void Start() {
 		mesh = GetComponent<MeshFilter>().sharedMesh = new Mesh();
-		//spline = new CubicBezierSpline (a.position, b.position, c.position, d.position);
 		spline = new CatmullRomSpline();
-		Debug.Log("Starting");
 
 		Reposition ();
 		int len = Mathf.CeilToInt(spline.ArcLength(1f) / 2f);

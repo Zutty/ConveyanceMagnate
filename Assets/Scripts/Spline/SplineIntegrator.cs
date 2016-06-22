@@ -105,10 +105,10 @@ namespace Spline {
 		}
 
 		public SplinePoint GetPointTrailing(float s, Vector3 c, float trail) {
-			s = Mathf.Clamp(s, 0f, _spline.ArcLength);
-
 			float MINIMUM_CURVE_RADIUS = 30f;
 			float minArc = 2f * MINIMUM_CURVE_RADIUS * Mathf.Asin(trail / (2f * MINIMUM_CURVE_RADIUS));
+
+			s = Mathf.Clamp(s, minArc, _spline.ArcLength);
 
 			float lowerBound = _spline.GetCurveParameter(s - minArc);
 			float upperBound = _spline.GetCurveParameter(s - trail);

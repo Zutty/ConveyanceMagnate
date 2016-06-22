@@ -105,7 +105,7 @@ public struct CatmullRomSpline {
 	}
 
 	public bool IsWithinArc(float s) {
-		return s > _arcOffset && s <= _arcOffset + _arcLength;
+		return s >= _arcOffset && s <= _arcOffset + _arcLength;
 	}
 
 	public float GlobalToLocal(float s) {
