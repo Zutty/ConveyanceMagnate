@@ -4,7 +4,7 @@ using Spline;
 
 public class UIStateManager : MonoBehaviour {
 
-	public enum UIState { NORMAL, CREATE_TRACK, DRAG_TRACK }
+	public enum UIState { NORMAL, CREATE_TRACK, DRAG_TRACK, BUILD_TRAIN }
 
 	private static UIStateManager _instance;
 
@@ -15,6 +15,7 @@ public class UIStateManager : MonoBehaviour {
 	public GameObject createTrackHandle;
 	public GameObject trackPrefab;
 	public LayerMask layerMask;
+	public SplineFollower trainPrefab;
 
 	private UIState _state = UIState.NORMAL;
 	private Transform _draggable;
@@ -30,10 +31,11 @@ public class UIStateManager : MonoBehaviour {
 		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 		RaycastHit hit;
 		Vector3 mousePosition = Vector3.zero;
-		if (Physics.Raycast (ray, out hit, 1000, layerMask) && hit.collider.gameObject.CompareTag("terrain")) {
+		if (Physics.Raycast(ray, out hit, 1000, layerMask) && hit.collider.gameObject.CompareTag("terrain")) {
 			mousePosition = hit.point;
 		}
 
+		// TODO Split this bullshit into separate classes you goit
 		if(_state == UIState.CREATE_TRACK) {
 			createTrackHandle.transform.position = mousePosition;
 				
@@ -51,6 +53,17 @@ public class UIStateManager : MonoBehaviour {
 			if(Input.GetMouseButtonUp(0)) {
 				ClearState();
 			}
+		} else if(_state == UIState.BUILD_TRAIN) {
+			if(Input.GetMouseButtonDown(0)) {
+				ClearState();
+				RaycastHit splineHit;
+				if (Physics.Raycast(ray, out splineHit, 1000) && splineHit.collider.gameObject.CompareTag("spline")) {
+					Transform segment = splineHit.collider.transform.parent;
+
+					SplineFollower train = (SplineFollower)Instantiate(trainPrefab);
+					train.spline = segment.GetComponentInParent<SplineIntegrator>();
+				}
+			}
 		}
 	}
 
@@ -66,5 +79,9 @@ public class UIStateManager : MonoBehaviour {
 	public void TriggerCreateTrack() {
 		_state = UIState.CREATE_TRACK;
 		_trackHandleProjector.enabled = true;
+	}
+
+	public void TriggerBuildTrain() {
+		_state = UIState.BUILD_TRAIN;
 	}
 }
