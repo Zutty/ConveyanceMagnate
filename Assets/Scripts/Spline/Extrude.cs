@@ -15,7 +15,7 @@ namespace Spline {
 		public int splineIndex;
 		public Shape shape;
 		public GameObject colliderSegmentPrefab;
-		public float elevation = 0.05f;
+		public float collisionWidth = 1f;
 
 		private Mesh mesh;
 
@@ -109,10 +109,9 @@ namespace Spline {
 				}
 
 				if(ci >= 0) {
-					//Debug.Log(" _colliderSegments["+ci+"] -> "+ p.position + " & " + prev);
 					_colliderSegments[ci].transform.position = (p.position + prev) / 2;
 					_colliderSegments[ci].transform.rotation = Quaternion.LookRotation(p.position - prev);
-					_colliderSegments[ci].size = new Vector3(2, 1, Vector3.Distance(p.position, prev));
+					_colliderSegments[ci].size = new Vector3(collisionWidth, 1f, Vector3.Distance(p.position, prev));
 				}
 				ci++;
 				prev = p.position;
