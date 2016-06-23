@@ -26,10 +26,9 @@ namespace Spline {
 				throw new UnityException("Cant add section at offset " + offset);
 			}
 
-			Vector3 position = (_spline.points[offset].position + _spline.points[offset - 1].position) / 2;
-			Quaternion rotation = Quaternion.LookRotation(_spline.points[offset].position - _spline.points[offset - 1].position);
+			Vector3 position = _spline[offset - 2].GetPosition(0.5f);//(_spline.points[offset].position + _spline.points[offset - 1].position) / 2;
 
-			GameObject newSection = (GameObject)Instantiate(sectionPrefab, position, rotation);
+			GameObject newSection = (GameObject)Instantiate(sectionPrefab, position, Quaternion.identity);
 			newSection.transform.parent = transform;
 
 			_spline.AddPoint(newSection.transform, offset);
