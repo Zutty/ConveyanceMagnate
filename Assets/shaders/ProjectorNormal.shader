@@ -10,7 +10,7 @@ Shader "Projector/Normal" {
 			ZWrite Off
 			ColorMask RGB
 			Blend OneMinusSrcAlpha SrcAlpha
-			Offset -1, -1
+			Offset -1, -2
 	
 			CGPROGRAM
 			#pragma vertex vert
