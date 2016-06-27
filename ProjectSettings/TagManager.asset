@@ -7,6 +7,7 @@ TagManager:
   - UIStateManager
   - terrain
   - spline
+  - SplineHandle
   layers:
   - Default
   - TransparentFX
