@@ -14,19 +14,19 @@ public class Handle : MonoBehaviour {
 	private Projector _projector;
 	private Material _baseMaterial;
 
-	void Start () {
+	public void Start () {
 		_projector = GetComponent<Projector> ();
 		_baseMaterial = _projector.material;
 	}
 	
-	void Update () {
-		if(mode == HandleMode.MOVE) {
+	public void Update () {
+		if(UIStateManager.instance.IsInState(UIStateManager.UIState.NORMAL) && mode == HandleMode.MOVE) {
 			Reposition();
 		}
 	}
 
-	void OnMouseDrag() {
-		if(mode == HandleMode.DRAG) {
+	public void OnMouseDrag() {
+		if(UIStateManager.instance.IsInState(UIStateManager.UIState.NORMAL) && mode == HandleMode.DRAG) {
 			Reposition();
 		}
 	}
@@ -39,11 +39,11 @@ public class Handle : MonoBehaviour {
 		}
 	}
 
-	void OnMouseOver() {
+	public void OnMouseOver() {
 		_projector.material = selectMaterial;
 	}
 
-	void OnMouseExit() {
+	public void OnMouseExit() {
 		_projector.material = _baseMaterial;
 	}
 }
