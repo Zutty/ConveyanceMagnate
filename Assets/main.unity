@@ -146,7 +146,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 7
 --- !u!1001 &57159290
 Prefab:
   m_ObjectHideFlags: 0
@@ -580,7 +580,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
 --- !u!1 &296843114
 GameObject:
   m_ObjectHideFlags: 0
@@ -900,7 +900,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
 --- !u!1 &1281594271
 GameObject:
   m_ObjectHideFlags: 0
@@ -974,7 +974,7 @@ Transform:
   - {fileID: 1408091566}
   - {fileID: 1089831028}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
 --- !u!1 &1398895887
 GameObject:
   m_ObjectHideFlags: 0
@@ -1184,7 +1184,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
 --- !u!1 &1616812525
 GameObject:
   m_ObjectHideFlags: 0
@@ -1364,10 +1364,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   createTrackHandle: {fileID: 1616812525}
   trackPrefab: {fileID: 148670, guid: 8f2113345878549a694cff0984ab7dc6, type: 2}
-  layerMask:
+  trainPrefab: {fileID: 11442666, guid: 9aaf0dac289ab6f46a969e605cd3f586, type: 2}
+  groundLayerMask:
     serializedVersion: 2
     m_Bits: 256
-  trainPrefab: {fileID: 11442666, guid: 9aaf0dac289ab6f46a969e605cd3f586, type: 2}
+  uiLayerMask:
+    serializedVersion: 2
+    m_Bits: 32
 --- !u!4 &2050891072
 Transform:
   m_ObjectHideFlags: 0
@@ -1381,7 +1384,7 @@ Transform:
   m_Children:
   - {fileID: 1616812526}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
 --- !u!114 &2050891073
 MonoBehaviour:
   m_ObjectHideFlags: 0
