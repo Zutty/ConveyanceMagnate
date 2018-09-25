@@ -1,3 +1,8 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: replaced '_Projector' with 'unity_Projector'
+// Upgrade NOTE: replaced '_ProjectorClip' with 'unity_ProjectorClip'
+
 Shader "Projector/Normal" {
 	Properties {
 		_Color ("Main Color", Color) = (1,1,1,1)
@@ -22,14 +27,14 @@ Shader "Projector/Normal" {
 				float4 pos : SV_POSITION;
 			};
 			
-			float4x4 _Projector;
-			float4x4 _ProjectorClip;
+			float4x4 unity_Projector;
+			float4x4 unity_ProjectorClip;
 			
 			v2f vert (float4 vertex : POSITION)
 			{
 				v2f o;
-				o.pos = mul (UNITY_MATRIX_MVP, vertex);
-				o.uvCookie = mul (_Projector, vertex);
+				o.pos = UnityObjectToClipPos (vertex);
+				o.uvCookie = mul (unity_Projector, vertex);
 				return o;
 			}
 			
