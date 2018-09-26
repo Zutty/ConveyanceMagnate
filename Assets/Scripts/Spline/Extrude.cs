@@ -4,19 +4,11 @@ using System.Collections.Generic;
 namespace Spline {
 	public class Extrude : MonoBehaviour {
 
-		[System.Serializable]
-		public struct Shape {
-			public Vector2[] vertices;
-			public Vector2[] normals;
-			public float[] u;
-			public int[] lines;
-		}
+		public ExtrudableShape shape;
+		//public GameObject colliderSegmentPrefab;
+		//public float collisionWidth = 1f;
 
-		public int splineIndex;
-		public Shape shape;
-		public GameObject colliderSegmentPrefab;
-		public float collisionWidth = 1f;
-
+		private SplineRenderer spline;
 		private Mesh mesh;
 
 		private int splineLen;
@@ -25,22 +17,17 @@ namespace Spline {
 		private Vector3[] normals;
 		private Vector2[] uv;
 
-		private List<BoxCollider> _colliderSegments = new List<BoxCollider>();
-		private CompositeSpline _compositeSpline;
+		//private List<BoxCollider> _colliderSegments = new List<BoxCollider>();
 
 		void Start() {
-			_compositeSpline = GetComponentInParent<CompositeSpline>();
+			spline = GetComponent<SplineRenderer>();
 			mesh = GetComponent<MeshFilter>().sharedMesh = new Mesh();
 
 			Resize(EstimateSplineLen());
 		}
 
-		private CatmullRomSpline spline {
-			get { return _compositeSpline[splineIndex]; }
-		}
-
 		private int EstimateSplineLen() {
-			return Mathf.CeilToInt(spline.ArcLength(1f) / 2f);
+			return Mathf.CeilToInt(spline.GetSpline().arcLength / 2f);
 		}
 
 		void Update() {
@@ -71,7 +58,7 @@ namespace Spline {
 			vertices = new Vector3[ vertexCount ];
 			normals = new Vector3[ vertexCount ];
 			uv = new Vector2[ vertexCount ];
-
+/*
 			int diff = splineLen - 1 - _colliderSegments.Count;
 			if(_colliderSegments.Count < splineLen - 1) {
 				for(int i = 0; i < diff; i++) {
@@ -88,7 +75,7 @@ namespace Spline {
 			if(splineLen - 1 != _colliderSegments.Count) {
 				Debug.Log("splineLen - 1 = " + (splineLen - 1) + ", _colliderSegments.Count = " + _colliderSegments.Count);
 			}
-
+*/
 			Recalculate();
 		}
 
@@ -101,7 +88,7 @@ namespace Spline {
 
 			int idx = 0, ci = -1;
 			Vector3 prev = Vector3.zero;
-			foreach(CatmullRomSpline.Point p in spline.Sample(splineLen)) {
+			foreach(Splines.Point p in Splines.Sample(spline.GetSpline(), splineLen)) {
 				for(int j = 0; j < shapeVertices; j++, idx++) {
 					vertices[idx] = transform.InverseTransformPoint(p.LocalToWorld(shape.vertices[j]));
 					normals[idx] = p.LocalToWorldDirection(shape.normals[j]);
@@ -109,9 +96,9 @@ namespace Spline {
 				}
 
 				if(ci >= 0) {
-					_colliderSegments[ci].transform.position = (p.position + prev) / 2;
-					_colliderSegments[ci].transform.rotation = Quaternion.LookRotation(p.position - prev);
-					_colliderSegments[ci].size = new Vector3(collisionWidth, 1f, Vector3.Distance(p.position, prev));
+					//_colliderSegments[ci].transform.position = (p.position + prev) / 2;
+					//_colliderSegments[ci].transform.rotation = Quaternion.LookRotation(p.position - prev);
+					//_colliderSegments[ci].size = new Vector3(collisionWidth, 1f, Vector3.Distance(p.position, prev));
 				}
 				ci++;
 				prev = p.position;

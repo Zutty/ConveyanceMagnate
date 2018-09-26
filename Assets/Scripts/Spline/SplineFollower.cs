@@ -59,7 +59,7 @@ namespace Spline {
 				units[i].transform.rotation = Quaternion.LookRotation(front.position - rear.position);
 
 				com += units[i].transform.position;
-				unitPosition = spline.ArcLength(rear.t) - (units[i].bufferLength + coupleDistance);
+				unitPosition = rear.s - (units[i].bufferLength + coupleDistance);
 			}
 
 			transform.position = com / (float)units.Count;

@@ -20,13 +20,14 @@ public class UIStateManager : MonoBehaviour {
 	public LayerMask uiLayerMask;
 
 	private UIState _state = UIState.NORMAL;
-	private Transform _draggable;
+	//private Transform _draggable;
 	private Projector _trackHandleProjector;
+	private GameObject _activeHandle;
 
 	void Start () {
 		_instance = this;
-		_trackHandleProjector = createTrackHandle.GetComponentInChildren<Projector>();
-		_trackHandleProjector.enabled = false;
+		//_trackHandleProjector = createTrackHandle.GetComponentInChildren<Projector>();
+		//_trackHandleProjector.enabled = false;
 	}
 	
 	void Update () {
@@ -41,46 +42,16 @@ public class UIStateManager : MonoBehaviour {
 		RaycastHit uiHit;
 		bool isUiHit = Physics.Raycast(ray, out uiHit, 1000, uiLayerMask) && uiHit.collider.gameObject.CompareTag("SplineHandle");
 
-		// TODO Split this bullshit into separate classes you goit
-		if(_state == UIState.CREATE_TRACK) {
-			_trackHandleProjector.enabled = !isUiHit;
+		if(Input.GetMouseButtonUp(0)) {
+			_activeHandle = null;
+		}
 
-			createTrackHandle.transform.position = mousePosition;
-				
-			if(Input.GetMouseButtonDown(0)) {
-				_state = UIState.DRAG_TRACK;
-				_trackHandleProjector.enabled = false;
+		if(isUiHit && Input.GetMouseButtonDown(0)) {
+			_activeHandle = uiHit.collider.gameObject;
+		}
 
-				GameObject newTrack = (GameObject)Instantiate(trackPrefab);
-				CompositeSpline spline = newTrack.GetComponent<CompositeSpline>();
-
-				if(isUiHit) {
-					// Reuse existing point
-					spline.points[1] = uiHit.collider.gameObject.transform;
-				} else {
-					// Create new point
-					spline.points[1].position = mousePosition;
-				}
-
-				_draggable = spline.points[2];
-				_draggable.position = mousePosition;
-			}
-		} else if(_state == UIState.DRAG_TRACK) {
-			_draggable.position = mousePosition;
-			if(Input.GetMouseButtonUp(0)) {
-				ClearState();
-			}
-		} else if(_state == UIState.BUILD_TRAIN) {
-			if(Input.GetMouseButtonDown(0)) {
-				ClearState();
-				RaycastHit splineHit;
-				if (Physics.Raycast(ray, out splineHit, 1000) && splineHit.collider.gameObject.CompareTag("spline")) {
-					Transform segment = splineHit.collider.transform.parent;
-
-					SplineFollower train = (SplineFollower)Instantiate(trainPrefab);
-					train.spline = segment.GetComponentInParent<SplineIntegrator>();
-				}
-			}
+		if(_activeHandle != null && Input.GetMouseButton(0)) {
+			_activeHandle.SendMessageUpwards("UIActiveHandle", uiHit, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
@@ -90,7 +61,7 @@ public class UIStateManager : MonoBehaviour {
 
 	public void ClearState() {
 		_state = UIState.NORMAL;
-		_draggable = null;
+		//_draggable = null;
 	}
 
 	public bool IsInState(UIState state) {
@@ -99,7 +70,7 @@ public class UIStateManager : MonoBehaviour {
 
 	public void TriggerCreateTrack() {
 		_state = UIState.CREATE_TRACK;
-		_trackHandleProjector.enabled = true;
+		//_trackHandleProjector.enabled = true;
 	}
 
 	public void TriggerBuildTrain() {

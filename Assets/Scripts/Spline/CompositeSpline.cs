@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using Maths;
 
 namespace Spline {
 	public class CompositeSpline : MonoBehaviour {
 		
 		public List<Transform> points;
 
-		private List<CatmullRomSpline> _curves = new List<CatmullRomSpline>();
+		private List<CubicSpline> _curves = new List<CubicSpline>();
 		private float _arcLength;
 
 		public int Length {
@@ -21,7 +22,7 @@ namespace Spline {
 			RecalculateCurves();
 		}
 
-		public CatmullRomSpline this[int index] {
+		public CubicSpline this[int index] {
 			get { return _curves[index]; }
 		}
 
@@ -50,28 +51,30 @@ namespace Spline {
 
 			float len = 0;
 			for(int offset = 0; offset < points.Count - 3; offset++) {
-				CatmullRomSpline spline = new CatmullRomSpline();
-				spline.p0 = points[offset].position;
-				spline.p1 = points[offset + 1].position;
-				spline.p2 = points[offset + 2].position;
-				spline.p3 = points[offset + 3].position;
-				spline.CalculateBasis(len);
+				HermiteForm control = new HermiteForm();
+				control.p0 = points[offset].position;
+				control.p1 = points[offset + 1].position;
+				control.m0 = points[offset + 2].position;
+				control.m1 = points[offset + 3].position;
+				CubicSpline spline = Splines.HermiteSpline(control);
 				_curves.Add(spline);
 
-				len += spline.Length;
+				len += spline.arcLength;
 			}
 			_arcLength = len;
 		}
 
-		public CatmullRomSpline CurveAtParameter(float t) {
+		public CubicSpline CurveAtParameter(float t) {
 			CheckT(t);
 			return _curves[(int)Mathf.Clamp(Mathf.Floor(t), 0, _curves.Count - 1)];
 		}
 
-		public CatmullRomSpline CurveAtArcLength(float s) {
+		public CubicSpline CurveAtArcLength(float s) {
 			CheckS(s);
+			float acc = 0;
 			for(int i = 0; i < _curves.Count; i++) {
-				if(_curves[i].IsWithinArc(s)) {
+				acc += _curves[i].arcLength;
+				if(s <= acc) {
 					return _curves[i];
 				}
 			}
@@ -80,23 +83,24 @@ namespace Spline {
 
 		public float GetCurveParameter(float s) {
 			CheckS(s);
-
+			float acc = 0;
 			for(int i = 0; i < _curves.Count; i++) {
-				if(_curves[i].IsWithinArc(s)) {
-					return (float)i + _curves[i].GetCurveParameter(_curves[i].GlobalToLocal(s));
+				if(s <= acc + _curves[i].arcLength) {
+					return (float)i + Splines.GetCurveParameter(_curves[i], s - acc);
 				}
+				acc += _curves[i].arcLength;
 			}
 			throw new UnityException("s " + s + " not valid");
 		}
 
 		public Vector3 GetPositionContinuous(float t) {
 			CheckT(t);
-			return CurveAtParameter(t).GetPosition(t - Mathf.Floor(t));
+			return CurveAtParameter(t).basis.Solve(t - Mathf.Floor(t));
 		}
 
 		public Vector3 GetTangentContinuous(float t) {
 			CheckT(t);
-			return CurveAtParameter(t).GetTangent(t - Mathf.Floor(t));
+			return CurveAtParameter(t).derivative.Solve(t - Mathf.Floor(t));
 		}
 
 		private void CheckT(float t) {

@@ -14,41 +14,7 @@ namespace Spline {
 			get { return (float)_spline.Length; }
 		}
 
-		public float ArcLength(float t) {
-			CatmullRomSpline spline = _spline.CurveAtParameter(t);
-			return spline.LocalToGlobal(spline.ArcLength(t - Mathf.Floor(t)));
-		}
 
-		public float CurveParameter(float s) {
-			float t = s / _spline.ArcLength;
-
-			float lower = 0f, upper = Tmax;
-			int MAX_ITERATIONS = 10;
-			float lastf = 0f;
-
-			for(int i = 0; i < MAX_ITERATIONS; i++) {
-				float f = ArcLength(t) - s;
-				lastf = f;
-				if(Mathf.Abs(f) < 0.001f) {
-					return t;
-				}
-
-				float df = _spline.GetTangentContinuous(t).magnitude;
-
-				float tCandidate = t - (f / df);
-
-				if(f > 0) {
-					upper = t;
-					t = (tCandidate <= lower) ? (upper + lower) / 2f : tCandidate;
-				} else {
-					lower = t;
-					t = (tCandidate >= upper) ? (upper + lower) / 2f : tCandidate;
-				}
-			}
-
-			Debug.LogWarning("Root for param " + s + " was not found after " + MAX_ITERATIONS + " iterations <"+lastf+"; "+lower+", "+t+", "+upper+">");
-			return t;
-		}
 
 		public float CircleIntersection(Vector3 c, float r, float lower, float upper) {
 			float t = (lower + upper) / 2f;
@@ -93,13 +59,23 @@ namespace Spline {
 		public SplinePoint GetPoint(float s) {
 			s = Mathf.Clamp(s, 0f, _spline.ArcLength - 1f);
 
-			CatmullRomSpline spline = _spline.CurveAtArcLength(s);
+			CubicSpline spline = _spline.CurveAtArcLength(s);
 
-			float t = spline.GetCurveParameter(spline.GlobalToLocal(s));
+			float t = _spline.GetCurveParameter(s);
 
 			SplinePoint p = new SplinePoint();
-			p.position = spline.GetPosition(t);
-			p.rotation = spline.GetRotation(t, Vector3.up);
+			p.position = spline.basis.Solve(t);
+
+			Vector3 tangent = spline.derivative.Solve(t);
+			Vector3 binormal = Vector3.Cross(Vector3.up, tangent).normalized;
+			Vector3 normal = Vector3.Cross(tangent, binormal);
+
+			if(tangent.magnitude <= 0.001f || tangent == Vector3.zero || normal.magnitude <= 0.001f || normal == Vector3.zero) {
+				Debug.Log ("bad thing - tangent.magnitude = " + tangent.magnitude + ", normal.magnitude = " + normal.magnitude);
+			}
+
+			p.rotation = Quaternion.LookRotation(tangent, normal);
+			p.s = s;
 			p.t = t;
 			return p;
 		}
@@ -118,6 +94,7 @@ namespace Spline {
 			SplinePoint p = new SplinePoint();
 			p.position = _spline.GetPositionContinuous(t);
 			p.rotation = GetRotation(t, Vector3.up);
+			p.s = s;
 			p.t = t;
 			return p;
 		}
