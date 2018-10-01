@@ -3,7 +3,7 @@ using System.Collections;
 using Maths;
 
 namespace Spline {
-	public class SplineRenderer : MonoBehaviour {
+	public class ControlEdge : MonoBehaviour {
 
 		public ControlPoint a;
 		public ControlPoint b;

@@ -112,52 +112,26 @@ namespace Spline {
 			return t;
 		}
 
-		// Everything below here is shit
+		// TODO encapsulate this in a Look-Up-Table
 
 		public struct Point {
 			public Vector3 position;
 			public Quaternion orientation;
-			public int index;
 			public float len;
-
-			public Vector3 LocalToWorld(Vector3 point) {
-				return position + orientation * point;
-			}
-
-			public Vector3 WorldToLocal(Vector3 point) {
-				return Quaternion.Inverse(orientation) * (point - position);
-			}
-
-			public Vector3 LocalToWorldDirection(Vector3 dir) {
-				return orientation * dir;
-			}
 		}
 
 		public static Point GetPoint(CubicSpline spline, float t, int index, float len) {
-			Vector3 position = spline.basis.Solve(t);
-			Vector3 tangent = spline.derivative.Solve(t);
-
-			Vector3 binormal = Vector3.Cross(Vector3.up, tangent).normalized;
-			Vector3 normal = Vector3.Cross(tangent, binormal);
-
-			if(tangent.magnitude <= 0.001f || tangent == Vector3.zero || normal.magnitude <= 0.001f || normal == Vector3.zero) {
-				Debug.Log ("bad thing - tangent.magnitude = " + tangent.magnitude + ", normal.magnitude = " + normal.magnitude);
-			}
-
-			Quaternion orientation = Quaternion.LookRotation(tangent, normal);
-
-			Point p = new Point();
-			p.position = position;
-			p.orientation = orientation;
-			p.index = index;
-			p.len = len;
-			return p;
+			return new Point {
+				position = spline.GetPosition(t),
+				orientation = Quaternion.LookRotation(spline.GetTangent(t)),
+				len = len
+			};
 		}
 
 		public static IEnumerable<Point> Sample(CubicSpline spline, int points) {
 			yield return GetPoint(spline, 0f, 0, 0f);
 
-			for(int n = 1; n < points - 1; n++) {
+			for (int n = 1; n < points - 1; n++) {
 				float s = (n / (points - 1f)) * spline.arcLength;
 
 				yield return GetPoint(spline, GetCurveParameter(spline, s), n, s);

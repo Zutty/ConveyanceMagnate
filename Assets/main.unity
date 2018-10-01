@@ -202,16 +202,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a416e94d43e27d498b5a29b6313542d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forwardHandle: {fileID: 1259548113}
-  backHandle: {fileID: 1720860972}
+  forwardLength: 30
+  backLength: 30
 --- !u!4 &78712550
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 78712548}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 43.4, y: 0, z: -5.1}
+  m_LocalRotation: {x: -0, y: -0.99979573, z: -0, w: -0.020213045}
+  m_LocalPosition: {x: 43.4, y: 0, z: -2.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1720860973}
@@ -219,7 +219,7 @@ Transform:
   - {fileID: 1259548118}
   m_Father: {fileID: 1609118731}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -182.316, z: 0}
 --- !u!1 &112854330
 GameObject:
   m_ObjectHideFlags: 0
@@ -853,15 +853,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a416e94d43e27d498b5a29b6313542d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forwardHandle: {fileID: 0}
-  backHandle: {fileID: 1861510994}
+  forwardLength: 30
+  backLength: 30
 --- !u!4 &718934050
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 718934048}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0.8507056, z: -0, w: 0.52564245}
   m_LocalPosition: {x: 28.97, y: 0, z: -22.36}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -869,7 +869,7 @@ Transform:
   - {fileID: 547639996}
   m_Father: {fileID: 1609118731}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -116.577, z: 0}
 --- !u!1 &719474140
 GameObject:
   m_ObjectHideFlags: 0
@@ -1296,7 +1296,7 @@ GameObject:
   - component: {fileID: 1259548115}
   - component: {fileID: 1259548114}
   m_Layer: 5
-  m_Name: fwd
+  m_Name: back
   m_TagString: SplineHandle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1313,9 +1313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88a62c10a1b9fa340aae92ce117720f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  splineRenderer: {fileID: 0}
-  linkTo: {fileID: 1720860972}
-  direction: 0
+  direction: 1
 --- !u!135 &1259548114
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1502,7 +1500,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1267112435}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10.2, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1333277866}
@@ -1573,8 +1571,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88a62c10a1b9fa340aae92ce117720f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  splineRenderer: {fileID: 895052085}
-  linkTo: {fileID: 0}
   direction: 0
 --- !u!120 &1267112441
 LineRenderer:
@@ -1613,7 +1609,7 @@ LineRenderer:
   m_SortingOrder: 0
   m_Positions:
   - {x: 0, y: 0, z: 0}
-  - {x: -10, y: 0, z: 0}
+  - {x: 0, y: 0, z: -10}
   m_Parameters:
     serializedVersion: 2
     widthMultiplier: 0.5
@@ -1786,15 +1782,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a416e94d43e27d498b5a29b6313542d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forwardHandle: {fileID: 1267112440}
-  backHandle: {fileID: 0}
+  forwardLength: 30
+  backLength: 0
 --- !u!4 &1333277866
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1333277864}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: 0.801977, z: -0, w: 0.59735495}
   m_LocalPosition: {x: 22.02, y: 0, z: 19.99}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -1802,7 +1798,7 @@ Transform:
   - {fileID: 1950214304}
   m_Father: {fileID: 1609118731}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 106.63901, z: 0}
 --- !u!1 &1543001263
 GameObject:
   m_ObjectHideFlags: 0
@@ -1925,7 +1921,7 @@ GameObject:
   - component: {fileID: 1720860975}
   - component: {fileID: 1720860974}
   m_Layer: 5
-  m_Name: end
+  m_Name: fwd
   m_TagString: SplineHandle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1942,9 +1938,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88a62c10a1b9fa340aae92ce117720f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  splineRenderer: {fileID: 0}
-  linkTo: {fileID: 1259548113}
-  direction: 1
+  direction: 0
 --- !u!4 &1720860973
 Transform:
   m_ObjectHideFlags: 0
@@ -2178,8 +2172,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88a62c10a1b9fa340aae92ce117720f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  splineRenderer: {fileID: 0}
-  linkTo: {fileID: 0}
   direction: 1
 --- !u!135 &1861510995
 SphereCollider:
@@ -2230,7 +2222,7 @@ LineRenderer:
   m_SortingOrder: 0
   m_Positions:
   - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: -10}
+  - {x: 0, y: 0, z: 10}
   m_Parameters:
     serializedVersion: 2
     widthMultiplier: 0.5
@@ -2333,8 +2325,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1861510993}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 10}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 718934050}

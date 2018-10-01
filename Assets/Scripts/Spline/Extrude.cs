@@ -8,7 +8,7 @@ namespace Spline {
 		//public GameObject colliderSegmentPrefab;
 		//public float collisionWidth = 1f;
 
-		private SplineRenderer spline;
+		private ControlEdge spline;
 		private Mesh mesh;
 
 		private int splineLen;
@@ -20,7 +20,7 @@ namespace Spline {
 		//private List<BoxCollider> _colliderSegments = new List<BoxCollider>();
 
 		void Start() {
-			spline = GetComponent<SplineRenderer>();
+			spline = GetComponent<ControlEdge>();
 			mesh = GetComponent<MeshFilter>().sharedMesh = new Mesh();
 
 			Resize(EstimateSplineLen());
@@ -90,8 +90,8 @@ namespace Spline {
 			Vector3 prev = Vector3.zero;
 			foreach(Splines.Point p in Splines.Sample(spline.GetSpline(), splineLen)) {
 				for(int j = 0; j < shapeVertices; j++, idx++) {
-					vertices[idx] = transform.InverseTransformPoint(p.LocalToWorld(shape.vertices[j]));
-					normals[idx] = p.LocalToWorldDirection(shape.normals[j]);
+					vertices[idx] = transform.InverseTransformPoint(p.position + p.orientation * shape.vertices[j]);
+					normals[idx] = p.orientation * shape.normals[j];
 					uv[idx] = new Vector2(shape.u[j], p.len / 2f);
 				}
 

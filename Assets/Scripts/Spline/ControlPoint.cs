@@ -4,20 +4,19 @@ using UnityEngine;
 
 namespace Spline {
     public class ControlPoint : MonoBehaviour {
-
-        public TangentHandle forwardHandle;
-        public TangentHandle backHandle;
+        public float forwardLength;
+        public float backLength;
 
         public Vector3 position {
             get { return transform.position; }
         }
 
         public Vector3 forwardTangent {
-            get { return forwardHandle.tangent; }
-        }
-        public Vector3 backTangent {
-            get { return backHandle.tangent; }
+            get { return transform.forward * forwardLength; }
         }
 
+        public Vector3 backTangent {
+            get { return transform.forward * backLength; }
+        }
     }
 }
