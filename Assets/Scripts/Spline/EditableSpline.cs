@@ -3,23 +3,23 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace Spline {
-	public class EditableSpline : MonoBehaviour {
+    public class EditableSpline : MonoBehaviour {
+        public GameObject sectionPrefab;
 
-		public GameObject sectionPrefab;
+        //private CompositeSpline _spline;
 
-		//private CompositeSpline _spline;
+        public void Start() {
+            //_spline = GetComponent<CompositeSpline>();
+        }
 
-		public void Start() {
-			//_spline = GetComponent<CompositeSpline>();
-		}
+        public void OnDrawGizmos() {
+            Gizmos.color = Color.white;
 
-		public void OnDrawGizmos() {
-			Gizmos.color = Color.white;
+            foreach (Transform child in transform) {
+                Gizmos.DrawWireSphere(child.position, 0.3f);
+            }
+        }
 
-			foreach(Transform child in transform) {
-				Gizmos.DrawWireSphere(child.position, 0.3f);
-			}
-		}
 /*
 		public void AddSection(int offset) {
 			if(offset < 1 || offset > _spline.points.Count - 2) {
@@ -44,5 +44,5 @@ namespace Spline {
 			AddSection(_spline.points.Count - 2);
 		}
 		*/
-	}
+    }
 }

@@ -1,36 +1,33 @@
 ﻿using UnityEngine;
-using System.Collections;
-using Maths;
 
 namespace Spline {
-	public class ControlEdge : MonoBehaviour {
+    public class ControlEdge : MonoBehaviour {
+        public ControlPoint a;
+        public ControlPoint b;
 
-		public ControlPoint a;
-		public ControlPoint b;
+        public CubicSpline GetSpline() {
+            HermiteForm hermiteForm;
+            hermiteForm.p0 = a.position;
+            hermiteForm.m0 = a.forwardTangent;
+            hermiteForm.p1 = b.position;
+            hermiteForm.m1 = b.backTangent;
+            return Splines.HermiteSpline(hermiteForm);
+        }
 
-		public CubicSpline GetSpline() {
-			var hermiteForm = new HermiteForm();
-			hermiteForm.p0 = a.position;
-			hermiteForm.m0 = a.forwardTangent;
-			hermiteForm.p1 = b.position;
-			hermiteForm.m1 = b.backTangent;
-			return Splines.HermiteSpline(hermiteForm);
-		}
+        public void OnDrawGizmos() {
+            Gizmos.color = Color.blue;
 
-		public void OnDrawGizmos() {
-			Gizmos.color = Color.blue;
+            var spline = GetSpline();
 
-			CubicSpline spline = GetSpline();
+            var prev = a.position;
 
-			Vector3 prev = a.position;
+            for (var t = 0.05f; t < 1f; t += 0.05f) {
+                var p = spline.basis.Solve(t);
+                Gizmos.DrawLine(prev, p);
+                prev = p;
+            }
 
-			for(float t = 0.05f; t < 1f; t += 0.05f) {
-				Vector3 p = spline.basis.Solve(t);
-				Gizmos.DrawLine(prev, p);
-				prev = p;
-			}
-
-			Gizmos.DrawLine(prev, b.position);
-		}
-	}
+            Gizmos.DrawLine(prev, b.position);
+        }
+    }
 }

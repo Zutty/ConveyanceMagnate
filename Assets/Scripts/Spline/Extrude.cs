@@ -1,63 +1,61 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 
 namespace Spline {
-	public class Extrude : MonoBehaviour {
+    public class Extrude : MonoBehaviour {
+        public ExtrudableShape shape;
+        //public GameObject colliderSegmentPrefab;
+        //public float collisionWidth = 1f;
 
-		public ExtrudableShape shape;
-		//public GameObject colliderSegmentPrefab;
-		//public float collisionWidth = 1f;
+        private ControlEdge spline;
+        private Mesh mesh;
 
-		private ControlEdge spline;
-		private Mesh mesh;
+        private int splineLen;
+        private int[] triangles;
+        private Vector3[] vertices;
+        private Vector3[] normals;
+        private Vector2[] uv;
 
-		private int splineLen;
-		private int[] triangles;
-		private Vector3[] vertices;
-		private Vector3[] normals;
-		private Vector2[] uv;
+        //private List<BoxCollider> _colliderSegments = new List<BoxCollider>();
 
-		//private List<BoxCollider> _colliderSegments = new List<BoxCollider>();
+        void Start() {
+            spline = GetComponent<ControlEdge>();
+            mesh = GetComponent<MeshFilter>().sharedMesh = new Mesh();
 
-		void Start() {
-			spline = GetComponent<ControlEdge>();
-			mesh = GetComponent<MeshFilter>().sharedMesh = new Mesh();
+            Resize(EstimateSplineLen());
+        }
 
-			Resize(EstimateSplineLen());
-		}
+        private int EstimateSplineLen() {
+            return Mathf.CeilToInt(spline.GetSpline().arcLength / 2f);
+        }
 
-		private int EstimateSplineLen() {
-			return Mathf.CeilToInt(spline.GetSpline().arcLength / 2f);
-		}
+        void Update() {
+            var len = EstimateSplineLen();
 
-		void Update() {
-			int len = EstimateSplineLen();
+            if (len != splineLen) {
+                Resize(len);
+            } else {
+                Recalculate();
+            }
+        }
 
-			if(len != splineLen) {
-				Resize(len);
-			} else {
-				Recalculate();
-			}
-		}
+        void Resize(int splineLen) {
+            if (splineLen <= 1) {
+                this.splineLen = 0;
+                triangles = new int[0];
+                vertices = new Vector3[0];
+                normals = new Vector3[0];
+                uv = new Vector2[0];
+                return;
+            }
 
-		void Resize(int splineLen) {
-			if(splineLen <= 1) {
-				this.splineLen = 0;
-				triangles = new int[0];
-				vertices = new Vector3[0];
-				normals = new Vector3[0];
-				uv = new Vector2[0];
-				return;
-			}
+            this.splineLen = splineLen;
+            var vertexCount = shape.vertices.Length * splineLen;
+            var indexCount = shape.lines.Length * (splineLen - 1) * 3;
 
-			this.splineLen = splineLen;
-			int vertexCount = shape.vertices.Length * splineLen;
-			int indexCount = shape.lines.Length * (splineLen - 1) * 3;
-
-			triangles = new int[ indexCount ];
-			vertices = new Vector3[ vertexCount ];
-			normals = new Vector3[ vertexCount ];
-			uv = new Vector2[ vertexCount ];
+            triangles = new int[indexCount];
+            vertices = new Vector3[vertexCount];
+            normals = new Vector3[vertexCount];
+            uv = new Vector2[vertexCount];
 /*
 			int diff = splineLen - 1 - _colliderSegments.Count;
 			if(_colliderSegments.Count < splineLen - 1) {
@@ -76,56 +74,57 @@ namespace Spline {
 				Debug.Log("splineLen - 1 = " + (splineLen - 1) + ", _colliderSegments.Count = " + _colliderSegments.Count);
 			}
 */
-			Recalculate();
-		}
+            Recalculate();
+        }
 
-		void Recalculate() {
-			if(splineLen == 0) {
-				return;
-			}
+        void Recalculate() {
+            if (splineLen == 0) {
+                return;
+            }
 
-			int shapeVertices = shape.vertices.Length;
+            var shapeVertices = shape.vertices.Length;
 
-			int idx = 0, ci = -1;
-			Vector3 prev = Vector3.zero;
-			foreach(Splines.Point p in Splines.Sample(spline.GetSpline(), splineLen)) {
-				for(int j = 0; j < shapeVertices; j++, idx++) {
-					vertices[idx] = transform.InverseTransformPoint(p.position + p.orientation * shape.vertices[j]);
-					normals[idx] = p.orientation * shape.normals[j];
-					uv[idx] = new Vector2(shape.u[j], p.len / 2f);
-				}
+            int idx = 0, ci = -1;
+            var prev = Vector3.zero;
+            foreach (Splines.Point p in Splines.Sample(spline.GetSpline(), splineLen)) {
+                for (int j = 0; j < shapeVertices; j++, idx++) {
+                    vertices[idx] = transform.InverseTransformPoint(p.position + p.orientation * shape.vertices[j]);
+                    normals[idx] = p.orientation * shape.normals[j];
+                    uv[idx] = new Vector2(shape.u[j], p.len / 2f);
+                }
 
-				if(ci >= 0) {
-					//_colliderSegments[ci].transform.position = (p.position + prev) / 2;
-					//_colliderSegments[ci].transform.rotation = Quaternion.LookRotation(p.position - prev);
-					//_colliderSegments[ci].size = new Vector3(collisionWidth, 1f, Vector3.Distance(p.position, prev));
-				}
-				ci++;
-				prev = p.position;
-			}
+                if (ci >= 0) {
+                    //_colliderSegments[ci].transform.position = (p.position + prev) / 2;
+                    //_colliderSegments[ci].transform.rotation = Quaternion.LookRotation(p.position - prev);
+                    //_colliderSegments[ci].size = new Vector3(collisionWidth, 1f, Vector3.Distance(p.position, prev));
+                }
 
-			int ti = 0;
-			for(int i = 0; i < splineLen - 1; i++) {
-				int offset = i * shapeVertices;
-				for(int l = 0; l < shape.lines.Length; l += 2) {
-					int pa = offset + shape.lines[l] + shapeVertices;
-					int pb = offset + shape.lines[l];
-					int pc = offset + shape.lines[l + 1];
-					int pd = offset + shape.lines[l + 1] + shapeVertices;
-					triangles[ti++] = pa;
-					triangles[ti++] = pb;
-					triangles[ti++] = pc;
-					triangles[ti++] = pc;
-					triangles[ti++] = pd;
-					triangles[ti++] = pa;
-				}
-			}
+                ci++;
+                prev = p.position;
+            }
 
-			mesh.Clear();
-			mesh.vertices = vertices;
-			mesh.triangles = triangles;
-			mesh.normals = normals;
-			mesh.uv = uv;
-		}
-	}
+            var ti = 0;
+            for (var i = 0; i < splineLen - 1; i++) {
+                var offset = i * shapeVertices;
+                for (var l = 0; l < shape.lines.Length; l += 2) {
+                    var pa = offset + shape.lines[l] + shapeVertices;
+                    var pb = offset + shape.lines[l];
+                    var pc = offset + shape.lines[l + 1];
+                    var pd = offset + shape.lines[l + 1] + shapeVertices;
+                    triangles[ti++] = pa;
+                    triangles[ti++] = pb;
+                    triangles[ti++] = pc;
+                    triangles[ti++] = pc;
+                    triangles[ti++] = pd;
+                    triangles[ti++] = pa;
+                }
+            }
+
+            mesh.Clear();
+            mesh.vertices = vertices;
+            mesh.triangles = triangles;
+            mesh.normals = normals;
+            mesh.uv = uv;
+        }
+    }
 }

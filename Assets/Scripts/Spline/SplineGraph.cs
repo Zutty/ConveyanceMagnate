@@ -1,8 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 namespace Spline {
-	public class SplineGraph : MonoBehaviour {
-		
-	}
+    public class SplineGraph : MonoBehaviour { }
 }
