@@ -4,7 +4,7 @@ using Maths;
 
 namespace Spline {
     public static class Splines {
-        public static CubicSpline HermiteSpline(HermiteForm control) {
+        public static CubicCurve HermiteSpline(HermiteForm control) {
             CubicPolynomial3 basis;
             basis.a = 2 * control.p0 - 2 * control.p1 + control.m0 + control.m1;
             basis.b = -3 * control.p0 + 3 * control.p1 - 2 * control.m0 - control.m1;
@@ -16,7 +16,7 @@ namespace Spline {
             derivative.b = -6 * control.p0 + 6 * control.p1 - 4 * control.m0 - 2 * control.m1;
             derivative.c = control.m0;
 
-            return new CubicSpline(basis, derivative, ArcLength(derivative));
+            return new CubicCurve(basis, derivative, ArcLength(derivative));
         }
 
         public static void SubdivideHermiteSpline(Vector3 p0, Vector3 p1, Vector3 m0, Vector3 m1,
@@ -27,7 +27,7 @@ namespace Spline {
             m1Prime.d = 6f * p0;
         }
 
-        public static CubicSpline CentripetalCatmullRomSpline(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3) {
+        public static CubicCurve CentripetalCatmullRomSpline(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3) {
             var dt0 = Mathf.Sqrt(Vector3.Distance(p0, p1));
             var dt1 = Mathf.Sqrt(Vector3.Distance(p1, p2));
             var dt2 = Mathf.Sqrt(Vector3.Distance(p2, p3));
@@ -65,7 +65,7 @@ namespace Spline {
             //_arcLength = ArcLength(1f);
             //_arcOffset = arcOffset;
 
-            return new CubicSpline();
+            return new CubicCurve();
         }
 
         public static float ArcLength(QuadraticPolynomial3 derivative, float tmax = 1f) {
@@ -85,19 +85,19 @@ namespace Spline {
             return sum / 2f;
         }
 
-        public static float GetCurveParameter(CubicSpline spline, float s) {
-            var t = s / spline.arcLength; // Initial guess
+        public static float GetCurveParameter(CubicCurve curve, float s) {
+            var t = s / curve.arcLength; // Initial guess
 
             float lower = 0f, upper = 1f;
             const float MAX_ITERATIONS = 10;
 
             for (var i = 0; i < MAX_ITERATIONS; i++) {
-                var f = ArcLength(spline.derivative, t) - s;
+                var f = ArcLength(curve.derivative, t) - s;
                 if (Mathf.Abs(f) < 0.001f) {
                     return t;
                 }
 
-                var df = spline.derivative.Solve(t).magnitude;
+                var df = curve.derivative.Solve(t).magnitude;
 
                 var tCandidate = t - (f / df);
 
@@ -122,24 +122,24 @@ namespace Spline {
             public float len;
         }
 
-        private static Point GetPoint(CubicSpline spline, float t, float len) {
+        private static Point GetPoint(CubicCurve curve, float t, float len) {
             return new Point {
-                position = spline.GetPosition(t),
-                orientation = Quaternion.LookRotation(spline.GetTangent(t)),
+                position = curve.GetPosition(t),
+                orientation = Quaternion.LookRotation(curve.GetTangent(t)),
                 len = len
             };
         }
 
-        public static IEnumerable<Point> Sample(CubicSpline spline, int points) {
-            yield return GetPoint(spline, 0f, 0f);
+        public static IEnumerable<Point> Sample(CubicCurve curve, int points) {
+            yield return GetPoint(curve, 0f, 0f);
 
             for (int n = 1; n < points - 1; n++) {
-                float s = (n / (points - 1f)) * spline.arcLength;
+                float s = (n / (points - 1f)) * curve.arcLength;
 
-                yield return GetPoint(spline, GetCurveParameter(spline, s), s);
+                yield return GetPoint(curve, GetCurveParameter(curve, s), s);
             }
 
-            yield return GetPoint(spline, 1f, spline.arcLength);
+            yield return GetPoint(curve, 1f, curve.arcLength);
         }
     }
 }

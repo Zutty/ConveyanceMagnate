@@ -5,7 +5,7 @@ namespace Spline {
     public class CompositeSpline : MonoBehaviour {
         public List<Transform> points;
 
-        private readonly List<CubicSpline> _curves = new List<CubicSpline>();
+        private readonly List<CubicCurve> _curves = new List<CubicCurve>();
 
         public int Length {
             get { return _curves.Count; }
@@ -17,7 +17,7 @@ namespace Spline {
             RecalculateCurves();
         }
 
-        public CubicSpline this[int index] {
+        public CubicCurve this[int index] {
             get { return _curves[index]; }
         }
 
@@ -59,12 +59,12 @@ namespace Spline {
             ArcLength = len;
         }
 
-        public CubicSpline CurveAtParameter(float t) {
+        public CubicCurve CurveAtParameter(float t) {
             CheckT(t);
             return _curves[(int) Mathf.Clamp(Mathf.Floor(t), 0, _curves.Count - 1)];
         }
 
-        public CubicSpline CurveAtArcLength(float s) {
+        public CubicCurve CurveAtArcLength(float s) {
             CheckS(s);
             float acc = 0;
             for (int i = 0; i < _curves.Count; i++) {

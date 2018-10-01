@@ -17,7 +17,7 @@ namespace Spline {
 
         //private List<BoxCollider> _colliderSegments = new List<BoxCollider>();
 
-        void Start() {
+        public void Start() {
             spline = GetComponent<ControlEdge>();
             mesh = GetComponent<MeshFilter>().sharedMesh = new Mesh();
 
@@ -25,10 +25,10 @@ namespace Spline {
         }
 
         private int EstimateSplineLen() {
-            return Mathf.CeilToInt(spline.GetSpline().arcLength / 2f);
+            return Mathf.CeilToInt(spline.curve.arcLength / 2f);
         }
 
-        void Update() {
+        public void Update() {
             var len = EstimateSplineLen();
 
             if (len != splineLen) {
@@ -38,9 +38,9 @@ namespace Spline {
             }
         }
 
-        void Resize(int splineLen) {
-            if (splineLen <= 1) {
-                this.splineLen = 0;
+        public void Resize(int newLength) {
+            if (newLength <= 1) {
+                splineLen = 0;
                 triangles = new int[0];
                 vertices = new Vector3[0];
                 normals = new Vector3[0];
@@ -48,9 +48,9 @@ namespace Spline {
                 return;
             }
 
-            this.splineLen = splineLen;
-            var vertexCount = shape.vertices.Length * splineLen;
-            var indexCount = shape.lines.Length * (splineLen - 1) * 3;
+            splineLen = newLength;
+            var vertexCount = shape.vertices.Length * newLength;
+            var indexCount = shape.lines.Length * (newLength - 1) * 3;
 
             triangles = new int[indexCount];
             vertices = new Vector3[vertexCount];
@@ -77,7 +77,7 @@ namespace Spline {
             Recalculate();
         }
 
-        void Recalculate() {
+        public void Recalculate() {
             if (splineLen == 0) {
                 return;
             }
@@ -86,7 +86,7 @@ namespace Spline {
 
             int idx = 0, ci = -1;
             var prev = Vector3.zero;
-            foreach (Splines.Point p in Splines.Sample(spline.GetSpline(), splineLen)) {
+            foreach (Splines.Point p in Splines.Sample(spline.curve, splineLen)) {
                 for (int j = 0; j < shapeVertices; j++, idx++) {
                     vertices[idx] = transform.InverseTransformPoint(p.position + p.orientation * shape.vertices[j]);
                     normals[idx] = p.orientation * shape.normals[j];
