@@ -19,12 +19,13 @@ namespace Spline {
             return new CubicCurve(basis, derivative, ArcLength(derivative));
         }
 
-        public static void SubdivideHermiteSpline(Vector3 p0, Vector3 p1, Vector3 m0, Vector3 m1,
-            out CubicPolynomial3 m1Prime) {
-            m1Prime.a = -12f * p0 - 6f * p1 - 3f * m0 + 3f * m1;
-            m1Prime.b = 12f * p1 + 8f * m0 - 2f * m1;
-            m1Prime.c = -48f * p0 - 5f * m0;
-            m1Prime.d = 6f * p0;
+        public static HermiteForm Subdivide(HermiteForm control, CubicCurve originalCurve, float u) {
+            HermiteForm subdivided;
+            subdivided.p0 = control.p0;
+            subdivided.m0 = u * control.m0;
+            subdivided.p1 = originalCurve.basis.Solve(u);
+            subdivided.m1 = u * originalCurve.derivative.Solve(u);
+            return subdivided;
         }
 
         public static CubicCurve CentripetalCatmullRomSpline(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3) {

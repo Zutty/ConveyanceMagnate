@@ -14,12 +14,12 @@ public class SubdivideTest : MonoBehaviour {
 		var controlEdge = GetComponent<ControlEdge>();
 		var originalCurve = controlEdge.curve;
 
-		HermiteForm subdiv;
-		subdiv.p0 = controlEdge.a.position;
-		subdiv.m0 = u * controlEdge.a.forwardTangent;
-		subdiv.p1 = originalCurve.basis.Solve(u);
-		subdiv.m1 = u * originalCurve.derivative.Solve(u);
-		var subdivided = Splines.HermiteSpline(subdiv);
+		HermiteForm hermiteForm;
+		hermiteForm.p0 = controlEdge.a.position;
+		hermiteForm.m0 = controlEdge.a.forwardTangent;
+		hermiteForm.p1 = controlEdge.b.position;
+		hermiteForm.m1 = controlEdge.b.backTangent;
+		var subdivided = Splines.HermiteSpline(Splines.Subdivide(hermiteForm, originalCurve, u));
 
 		Vector3 prev = controlEdge.a.position;
 
