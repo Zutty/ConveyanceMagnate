@@ -173,7 +173,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &78712548
 GameObject:
@@ -719,7 +719,7 @@ RectTransform:
   - {fileID: 112854331}
   - {fileID: 198347336}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -769,9 +769,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2e8c6559c35c5f41b8a64c1a3dc8609, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  terrainLayerMask:
-    serializedVersion: 2
-    m_Bits: 256
 --- !u!135 &547639998
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -968,6 +965,7 @@ GameObject:
   - component: {fileID: 895052086}
   - component: {fileID: 895052087}
   - component: {fileID: 895052088}
+  - component: {fileID: 895052089}
   m_Layer: 0
   m_Name: segment1
   m_TagString: Untagged
@@ -1055,6 +1053,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shape: {fileID: 11400000, guid: 3d88fdc2d174af64abad27450047726c, type: 2}
+--- !u!114 &895052089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 895052083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d82bbb93cae83a742a8047498fa593e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  segments: 5
+  width: 2
 --- !u!1 &1006970901
 GameObject:
   m_ObjectHideFlags: 0
@@ -1280,7 +1291,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1 &1259548112
 GameObject:
@@ -1664,97 +1675,6 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 0
   m_Loop: 0
---- !u!1 &1297707147
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 100000, guid: 5a283b5fb3a1d724996fa951ba885df8,
-    type: 3}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1297707151}
-  - component: {fileID: 1297707150}
-  - component: {fileID: 1297707149}
-  - component: {fileID: 1297707148}
-  m_Layer: 0
-  m_Name: track_atom
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1297707148
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1297707147}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3782c42f73e1fe142898072a1d91e025, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mesh: {fileID: 4300000, guid: 5a283b5fb3a1d724996fa951ba885df8, type: 3}
-  count: 500
-  offset: {x: 0, y: 0, z: 0.58}
---- !u!23 &1297707149
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 2300000, guid: 5a283b5fb3a1d724996fa951ba885df8,
-    type: 3}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1297707147}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RenderingLayerMask: 4294967295
-  m_Materials:
-  - {fileID: 2100000, guid: 5a283b5fb3a1d724996fa951ba885df8, type: 3}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 0
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
---- !u!33 &1297707150
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 3300000, guid: 5a283b5fb3a1d724996fa951ba885df8,
-    type: 3}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1297707147}
-  m_Mesh: {fileID: 4300000, guid: 5a283b5fb3a1d724996fa951ba885df8, type: 3}
---- !u!4 &1297707151
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 400000, guid: 5a283b5fb3a1d724996fa951ba885df8,
-    type: 3}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1297707147}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 30.40809, y: -1.0660696, z: 6.9599504}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1333277864
 GameObject:
   m_ObjectHideFlags: 0
@@ -1869,7 +1789,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1609118730
 GameObject:
@@ -1905,7 +1825,7 @@ Transform:
   - {fileID: 719474141}
   - {fileID: 283876127}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1720860971
 GameObject:
@@ -2125,9 +2045,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2e8c6559c35c5f41b8a64c1a3dc8609, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  terrainLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
 --- !u!4 &1735050881
 Transform:
   m_ObjectHideFlags: 0
@@ -2504,9 +2421,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2e8c6559c35c5f41b8a64c1a3dc8609, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  terrainLayerMask:
-    serializedVersion: 2
-    m_Bits: 256
 --- !u!1 &2050891070
 GameObject:
   m_ObjectHideFlags: 0
@@ -2555,7 +2469,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2050891073
 MonoBehaviour:
@@ -2611,9 +2525,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2e8c6559c35c5f41b8a64c1a3dc8609, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  terrainLayerMask:
-    serializedVersion: 2
-    m_Bits: 256
 --- !u!135 &2077481013
 SphereCollider:
   m_ObjectHideFlags: 0
