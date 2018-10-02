@@ -1,12 +1,11 @@
 ﻿using UnityEngine;
 
 namespace Spline {
+    [RequireComponent(typeof(ControlEdge))]
     public class Extrude : MonoBehaviour {
         public ExtrudableShape shape;
-        //public GameObject colliderSegmentPrefab;
-        //public float collisionWidth = 1f;
 
-        private ControlEdge spline;
+        private ControlEdge _edge;
         private Mesh mesh;
 
         private int splineLen;
@@ -15,17 +14,15 @@ namespace Spline {
         private Vector3[] normals;
         private Vector2[] uv;
 
-        //private List<BoxCollider> _colliderSegments = new List<BoxCollider>();
-
         public void Start() {
-            spline = GetComponent<ControlEdge>();
+            _edge = GetComponent<ControlEdge>();
             mesh = GetComponent<MeshFilter>().sharedMesh = new Mesh();
 
             Resize(EstimateSplineLen());
         }
 
         private int EstimateSplineLen() {
-            return Mathf.CeilToInt(spline.curve.arcLength / 2f);
+            return Mathf.CeilToInt(_edge.curve.arcLength / 2f);
         }
 
         public void Update() {
@@ -56,24 +53,7 @@ namespace Spline {
             vertices = new Vector3[vertexCount];
             normals = new Vector3[vertexCount];
             uv = new Vector2[vertexCount];
-/*
-			int diff = splineLen - 1 - _colliderSegments.Count;
-			if(_colliderSegments.Count < splineLen - 1) {
-				for(int i = 0; i < diff; i++) {
-					GameObject colliderSegment = (GameObject)Instantiate(colliderSegmentPrefab);
-					colliderSegment.transform.parent = transform;
-					_colliderSegments.Add(colliderSegment.GetComponent<BoxCollider>());
-				}
-			} else if(_colliderSegments.Count > splineLen - 1) {
-				for(int i = splineLen - 1; i < _colliderSegments.Count; i++) {
-					Destroy(_colliderSegments[i].gameObject);
-				}
-				_colliderSegments.RemoveRange(splineLen - 1, _colliderSegments.Count - splineLen + 1);
-			}
-			if(splineLen - 1 != _colliderSegments.Count) {
-				Debug.Log("splineLen - 1 = " + (splineLen - 1) + ", _colliderSegments.Count = " + _colliderSegments.Count);
-			}
-*/
+
             Recalculate();
         }
 
@@ -84,23 +64,13 @@ namespace Spline {
 
             var shapeVertices = shape.vertices.Length;
 
-            int idx = 0, ci = -1;
-            var prev = Vector3.zero;
-            foreach (Splines.Point p in Splines.Sample(spline.curve, splineLen)) {
-                for (int j = 0; j < shapeVertices; j++, idx++) {
+            var idx = 0;
+            foreach (var p in Splines.Sample(_edge.curve, splineLen)) {
+                for (var j = 0; j < shapeVertices; j++, idx++) {
                     vertices[idx] = transform.InverseTransformPoint(p.position + p.orientation * shape.vertices[j]);
                     normals[idx] = p.orientation * shape.normals[j];
                     uv[idx] = new Vector2(shape.u[j], p.len / 2f);
                 }
-
-                if (ci >= 0) {
-                    //_colliderSegments[ci].transform.position = (p.position + prev) / 2;
-                    //_colliderSegments[ci].transform.rotation = Quaternion.LookRotation(p.position - prev);
-                    //_colliderSegments[ci].size = new Vector3(collisionWidth, 1f, Vector3.Distance(p.position, prev));
-                }
-
-                ci++;
-                prev = p.position;
             }
 
             var ti = 0;
