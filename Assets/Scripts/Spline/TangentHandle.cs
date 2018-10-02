@@ -39,7 +39,7 @@ namespace Spline {
             return isForward ? v : -v;
         }
 
-        private static Vector3 planeRayIntersection(Vector3 origin, Ray ray) {
+        public static Vector3 PlaneRayIntersection(Vector3 origin, Ray ray) {
             var plane = new Plane(Vector3.up, origin);
 
             float dist;
@@ -52,7 +52,7 @@ namespace Spline {
 
         void UIActiveHandle(RaycastHit hit) {
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            var mousePoint = planeRayIntersection(_controlPoint.position, ray);
+            var mousePoint = PlaneRayIntersection(_controlPoint.position, ray);
             var localPoint = directional(mousePoint - _controlPoint.position);
 
             _controlPoint.transform.rotation = Quaternion.LookRotation(localPoint);
