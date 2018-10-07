@@ -3,50 +3,41 @@ using System.Collections.Generic;
 
 namespace Spline {
     public class SplineFollower : MonoBehaviour {
+        
+        public ContinuousCurve curve;
+        public Position position;
         public float speed = 0.5f;
-        public SplineIntegrator spline;
         public List<SplineFollowerUnit> units;
         public float coupleDistance;
 
-        private float distance;
-        private bool _move;
-        private float _straightLength;
-
-        public float straightLength {
-            get { return _straightLength; }
-        }
+        public float straightLength { get; private set; }
 
         public void Start() {
             CalculateLength();
-            distance = _straightLength;
-            _move = true;
-            Move();
+            Reposition();
         }
 
         private void CalculateLength() {
-            _straightLength = coupleDistance * (units.Count - 1f);
-            for (int i = 0; i < units.Count; i++) {
-                _straightLength += units[i].straightLength;
-            }
+            straightLength = coupleDistance * (units.Count - 1f);
+            foreach (var unit in units) {
+                straightLength += unit.straightLength;
+             }
         }
 
         public void Update() {
-            if (_move) {
-                Move();
-            }
+            position = curve.Move(position, speed * Time.deltaTime);
+            Reposition();
         }
 
-        public void Move() {
-            distance += speed * Time.deltaTime;
-
+        public void Reposition() {
             var com = Vector3.zero;
-            var unitPosition = distance;
+            var unitPosition = position;
 
             foreach (var unit in units) {
-                unitPosition -= unit.bufferLength;
+                unitPosition.s -= unit.bufferLength;
 
-                SplinePoint front = spline.GetPoint(unitPosition);
-                SplinePoint rear = spline.GetPointTrailing(unitPosition, front.position, unit.baseLength);
+                var front = spline.GetPoint(unitPosition);
+                var rear = spline.GetPointTrailing(unitPosition, front.position, unit.baseLength);
 
                 unit.frontFollower.position = front.position;
                 unit.frontFollower.rotation = front.rotation;
@@ -58,7 +49,7 @@ namespace Spline {
                 unit.transform.rotation = Quaternion.LookRotation(front.position - rear.position);
 
                 com += unit.transform.position;
-                unitPosition = rear.s - (unit.bufferLength + coupleDistance);
+                unitPosition.s = rear.s - (unit.bufferLength + coupleDistance);
             }
 
             transform.position = com / units.Count;
