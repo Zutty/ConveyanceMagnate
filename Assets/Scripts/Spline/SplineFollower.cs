@@ -5,7 +5,8 @@ namespace Spline {
     public class SplineFollower : MonoBehaviour {
         
         public ContinuousCurve curve;
-        public Position position;
+        public float distance;
+        
         public float speed = 0.5f;
         public List<SplineFollowerUnit> units;
         public float coupleDistance;
@@ -13,6 +14,7 @@ namespace Spline {
         public float straightLength { get; private set; }
 
         public void Start() {
+            curve = GetComponent<ContinuousCurve>();
             CalculateLength();
             Reposition();
         }
@@ -25,19 +27,19 @@ namespace Spline {
         }
 
         public void Update() {
-            position = curve.Move(position, speed * Time.deltaTime);
+            distance = curve.Advance(distance + speed * Time.deltaTime);
             Reposition();
         }
 
         public void Reposition() {
             var com = Vector3.zero;
-            var unitPosition = position;
+            var unitPosition = distance;
 
             foreach (var unit in units) {
-                unitPosition.s -= unit.bufferLength;
-
-                var front = spline.GetPoint(unitPosition);
-                var rear = spline.GetPointTrailing(unitPosition, front.position, unit.baseLength);
+                unitPosition -= unit.bufferLength;
+                
+                var front = curve.GetPoint(unitPosition);
+                var rear = curve.GetPointTrailing(unitPosition, front.position, unit.baseLength);
 
                 unit.frontFollower.position = front.position;
                 unit.frontFollower.rotation = front.rotation;
@@ -49,7 +51,7 @@ namespace Spline {
                 unit.transform.rotation = Quaternion.LookRotation(front.position - rear.position);
 
                 com += unit.transform.position;
-                unitPosition.s = rear.s - (unit.bufferLength + coupleDistance);
+                unitPosition = rear.s - (unit.bufferLength + coupleDistance);
             }
 
             transform.position = com / units.Count;

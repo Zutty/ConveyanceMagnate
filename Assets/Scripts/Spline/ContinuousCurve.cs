@@ -1,75 +1,92 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Spline {
     public class ContinuousCurve : MonoBehaviour {
 
-        private SplineGraph _splineGraph;
+        public Path origin;
 
-        private void Start() {
-            _splineGraph = GetComponent<SplineGraph>();
+        public float Advance(float s) {
+            float remainder;
+            int steps;
+            origin = WalkByArcLength(s, out remainder, out steps);
+            return remainder;
         }
 
         public CubicCurve CurveAtParameter(float t) {
-            CheckT(t);
-            return _curves[(int) Mathf.Clamp(Mathf.Floor(t), 0, _curves.Count - 1)];
+            return origin.Walk((int) Mathf.Floor(t)).GetCurve();
         }
 
         public CubicCurve CurveAtArcLength(float s) {
-            CheckS(s);
-            float acc = 0;
-            for (int i = 0; i < _curves.Count; i++) {
-                acc += _curves[i].arcLength;
-                if (s <= acc) {
-                    return _curves[i];
-                }
-            }
-
-            throw new UnityException("s " + s + " not valid");
+            float remainder;
+            int steps;
+            return WalkByArcLength(s, out remainder, out steps).GetCurve();
         }
 
         public float GetCurveParameter(float s) {
-            CheckS(s);
-            float acc = 0;
-            for (int i = 0; i < _curves.Count; i++) {
-                if (s <= acc + _curves[i].arcLength) {
-                    return i + Splines.GetCurveParameter(_curves[i], s - acc);
+            float remainder;
+            int steps;
+            var path = WalkByArcLength(s, out remainder, out steps);
+            return Splines.GetCurveParameter(path.GetCurve(), remainder) + steps;
+        }
+
+        private Path WalkByArcLength(float arcLen, out float s, out int steps) {
+            var walk = origin;
+            s = arcLen;
+            steps = 0;
+            
+            while (s < 0 || s >= walk.GetCurve().arcLength) {
+                if (s >= walk.GetCurve().arcLength) {
+                    s -= walk.GetCurve().arcLength;
+                    steps++;
+                    walk = walk.WalkForward();
+                    continue;
                 }
 
-                acc += _curves[i].arcLength;
+                steps--;
+                walk = walk.WalkBack();
+                s += walk.GetCurve().arcLength;
             }
+            return walk;
 
-            throw new UnityException("s " + s + " not valid");
+        }
+        
+        public float ArcLength(float t) {
+            var walk = origin;
+            var s = 0f;
+            
+            while (t < 0f || t >= 1f) {
+                if (t >= 1f) {
+                    s += walk.GetCurve().arcLength;
+                    t--;
+                    walk = walk.WalkForward();
+                    continue;
+                }
+
+                walk = walk.WalkBack();
+                s -= walk.GetCurve().arcLength;
+                t++;
+            }
+            
+            return s + Splines.ArcLength(walk.GetCurve().derivative, t);
         }
 
         public Vector3 GetPositionContinuous(float t) {
-            CheckT(t);
-            return CurveAtParameter(t).basis.Solve(t - Mathf.Floor(t));
+            return CurveAtParameter(t).GetPosition(t - Mathf.Floor(t));
         }
 
         public Vector3 GetTangentContinuous(float t) {
-            CheckT(t);
-            return CurveAtParameter(t).derivative.Solve(t - Mathf.Floor(t));
+            return CurveAtParameter(t).GetTangent(t - Mathf.Floor(t));
         }
 
-        private void CheckT(float t) {
-            if (t < 0f || t > Length) {
-                throw new UnityException("t " + t + " is not within parameter bounds");
-            }
-        }
-
-        private void CheckS(float s) {
-            if (s < 0f || s > ArcLength) {
-                throw new UnityException("s " + s + " is not within arc length");
-            }
-        }
-        
         public float CircleIntersection(Vector3 c, float r, float lower, float upper) {
             var t = (lower + upper) / 2f;
             const float MAX_ITERATIONS = 10;
             var lastf = 0f;
 
             for (var i = 0; i < MAX_ITERATIONS; i++) {
-                var position = _spline.GetPositionContinuous(t);
+                var position = GetPositionContinuous(t);
                 var f = (position - c).sqrMagnitude - (r * r);
                 lastf = f;
 
@@ -77,15 +94,15 @@ namespace Spline {
                     return t;
                 }
 
-                var tangent = _spline.GetTangentContinuous(t);
+                var tangent = GetTangentContinuous(t);
                 var df = 2f * ((position.x - c.x) * tangent.x + (position.y - c.y) * tangent.y +
                                (position.z - c.z) * tangent.z);
 
                 t -= f / df;
 
-                if (t < 0f || t > _spline.Length) {
-                    return 0;
-                }
+                //if (t < 0f || t > 1) {
+                //    return 0;
+                //}
             }
 
             Debug.LogWarning("Circle intersection [c = " + c + ", r = " + r + ", lower = " + lower + ", upper = " +
@@ -94,82 +111,37 @@ namespace Spline {
             return t;
         }
 
-        public Quaternion GetRotation(float t, Vector3 up) {
-            Vector3 tangent = _spline.GetTangentContinuous(t);
-            Vector3 binormal = Vector3.Cross(up, tangent).normalized;
-            Vector3 normal = Vector3.Cross(tangent, binormal);
-
-            if (tangent.magnitude <= 0.001f || tangent == Vector3.zero || normal.magnitude <= 0.001f ||
-                normal == Vector3.zero) {
-                Debug.Log("bad thing - tangent.magnitude = " + tangent.magnitude + ", normal.magnitude = " +
-                          normal.magnitude);
-            }
-
-            return Quaternion.LookRotation(tangent, normal);
-        }
-
         public SplinePoint GetPoint(float s) {
-            s = Mathf.Clamp(s, 0f, _spline.ArcLength - 1f);
+            float remainder;
+            int steps;
+            var curve = WalkByArcLength(s, out remainder, out steps).GetCurve();
+            var t = Splines.GetCurveParameter(curve, remainder);
 
-            var spline = _spline.CurveAtArcLength(s);
-
-            var t = _spline.GetCurveParameter(s);
-
-            SplinePoint p;
-            p.position = spline.basis.Solve(t);
-
-            var tangent = spline.derivative.Solve(t);
-            var binormal = Vector3.Cross(Vector3.up, tangent).normalized;
-            var normal = Vector3.Cross(tangent, binormal);
-
-            if (tangent.magnitude <= 0.001f || tangent == Vector3.zero || normal.magnitude <= 0.001f ||
-                normal == Vector3.zero) {
-                Debug.Log("bad thing - tangent.magnitude = " + tangent.magnitude + ", normal.magnitude = " +
-                          normal.magnitude);
-            }
-
-            p.rotation = Quaternion.LookRotation(tangent, normal);
-            p.s = s;
-            p.t = t;
-            return p;
+            return new SplinePoint {
+                position = curve.GetPosition(t),
+                rotation = Quaternion.LookRotation(curve.GetTangent(t)),
+                s = s,
+                t = t
+            };
         }
 
         public SplinePoint GetPointTrailing(float s, Vector3 c, float trail) {
             const float MINIMUM_CURVE_RADIUS = 30f;
             var minArc = 2f * MINIMUM_CURVE_RADIUS * Mathf.Asin(trail / (2f * MINIMUM_CURVE_RADIUS));
 
-            s = Mathf.Clamp(s, minArc, _spline.ArcLength);
+            //s = Mathf.Clamp(s, minArc, _spline.ArcLength);
 
             var lowerBound = GetCurveParameter(s - minArc);
             var upperBound = GetCurveParameter(s - trail);
 
             var t = CircleIntersection(c, trail, lowerBound, upperBound);
 
-            SplinePoint p;
-            p.position = _spline.GetPositionContinuous(t);
-            p.rotation = GetRotation(t, Vector3.up);
-            p.s = s;
-            p.t = t;
-            return p;
-        }
-
-        public Position Move(Position position, float distance) {
-            position.s += distance;
-            var curve = _splineGraph.GetCurve(position);
-            if (position.s > curve.arcLength) {
-                position.s - curve.arcLength;
-            }
-
-            return position;
-        }
-
-        public Vector3 GetPosition(Position position) {
-            var curve = _splineGraph.GetCurve(position.a, position.b);
-            return curve.GetPosition(position.s);
-        }
-
-        public Quaternion GetRotation(Position position) {
-            return Quaternion.LookRotation();
+            return new SplinePoint {
+                position = GetPositionContinuous(t),
+                rotation = Quaternion.LookRotation(GetTangentContinuous(t)),
+                s = ArcLength(t),
+                t = t
+            };
         }
     }
 }

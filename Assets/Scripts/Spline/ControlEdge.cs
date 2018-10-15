@@ -1,9 +1,21 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Spline {
     public class ControlEdge : MonoBehaviour {
         public ControlPoint a;
         public ControlPoint b;
+
+        public ControlEdge aNeighbor;
+        public ControlEdge bNeighbor;
+        
+        public ControlEdge NextAwayFrom(ControlPoint p) {
+            if (p != a && p != b) {
+                throw new Exception("This doesnt make sense");
+            }
+
+            return p == a ? bNeighbor : aNeighbor;
+        }
 
         public CubicCurve curve {
             get {
