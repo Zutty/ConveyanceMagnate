@@ -8,6 +8,8 @@ namespace Spline {
 
         public ControlEdge aNeighbor;
         public ControlEdge bNeighbor;
+
+        public bool invert;
         
         public ControlEdge NextAwayFrom(ControlPoint p) {
             if (p != a && p != b) {
@@ -23,7 +25,7 @@ namespace Spline {
                 hermiteForm.p0 = a.position;
                 hermiteForm.m0 = a.forwardTangent;
                 hermiteForm.p1 = b.position;
-                hermiteForm.m1 = b.backTangent;
+                hermiteForm.m1 = invert ? -b.backTangent : b.backTangent;
                 return Splines.HermiteSpline(hermiteForm);
             }
         }
@@ -40,6 +42,19 @@ namespace Spline {
             }
 
             Gizmos.DrawLine(prev, b.position);
+            
+            Gizmos.color = Color.green;
+
+            var reverse = Splines.HermiteSpline(new HermiteForm {
+                p0 = b.position,
+                m0 = -b.forwardTangent,
+                p1 = a.position,
+                m1 = invert ? a.backTangent : -a.backTangent
+            });
+
+            for (var t = 0f; t < 1f; t += 0.05f) {
+                Gizmos.DrawLine(reverse.GetPosition(t), reverse.GetPosition(t + 0.05f));
+            }
         }
     }
 }

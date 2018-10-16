@@ -60,11 +60,13 @@ namespace Spline {
         }
 
         public CubicCurve GetCurve() {
+            bool a = point == edge.b;
+            bool b = edge.invert;
             return Splines.HermiteSpline(new HermiteForm {
                 p0 = point.position,
-                m0 = point.forwardTangent,
+                m0 = point == edge.b ? -point.forwardTangent : point.forwardTangent,
                 p1 = _opposite.position,
-                m1 = _opposite.backTangent
+                m1 = edge.invert == (point == edge.b) ? _opposite.backTangent : -_opposite.backTangent
             });
         }
     }
